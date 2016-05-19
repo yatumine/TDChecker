@@ -6,55 +6,59 @@ namespace COMMON.Utility
 {
     static class SoundUtility
     {
-        public enum SOUND_TYPE 
+        /// <summary>
+        /// 再生音形式
+        /// </summary>
+        public enum SoundType : int
         {
-            e_NO_SOUND = 0,
-            e_PLAY_CHIME,
-            e_PLAY_BELL_RING,
-            e_PLAY_PLAY_MUSIC,
+            e_NoSound = 0,
+            e_PlayChime,
+            e_PlayRing,
+            e_PlayMusic,
+        };
+
+        /// <summary>
+        /// 再生秒数
+        /// </summary>
+        public enum PlaySec : int
+        {
+            e_10_Sec = 10000,
         };
 
         /// <summary>
         /// サウンド再生
         /// </summary>
-        /// <param name="p_SoundType"></param>
-        static public void CallSound( SOUND_TYPE p_SoundType )
+        /// <param name="soundType">再生音形式（SoundType）</param>
+        static public void CallSound( SoundType soundType )
         {
-            switch ( p_SoundType )
+            switch ( soundType )
             {
-                case SOUND_TYPE.e_NO_SOUND:
+                case SoundType.e_NoSound:
                     break;
-                case SOUND_TYPE.e_PLAY_CHIME:
+                case SoundType.e_PlayChime:
                     Microsoft.SmallBasic.Library.Sound.PlayChimes();
                     break;
-                case SOUND_TYPE.e_PLAY_BELL_RING:
+                case SoundType.e_PlayRing:
                     Microsoft.SmallBasic.Library.Sound.PlayBellRing();
                     break;
-                case SOUND_TYPE.e_PLAY_PLAY_MUSIC:
+                case SoundType.e_PlayMusic:
                     Microsoft.SmallBasic.Library.Sound.Play(Settings.Default.BellSoundFile);
                     break;
                 default:
                     break;
             }
-
-            return;
         }
 
-
-        static public async void PlayTimerAsync(String pFilePath, int pPlaySec)
+        /// <summary>
+        /// 指定ファイル再生
+        /// </summary>
+        /// <param name="filePath">再生ファイルPath</param>
+        /// <param name="playSec">再生秒数</param>
+        static public async void PlayTimerAsync(String filePath, PlaySec playSec)
         {
-            int iSec = pPlaySec * 1000;
-            try
-            {
-                Microsoft.SmallBasic.Library.Sound.Play(pFilePath);
-                await Task.Delay(iSec);
-                Microsoft.SmallBasic.Library.Sound.Stop(pFilePath);
-            }
-            catch (Exception)
-            {
-                Microsoft.SmallBasic.Library.Sound.Play(pFilePath);
-            }
-
+            Microsoft.SmallBasic.Library.Sound.Play(filePath);
+            await Task.Delay((int)playSec);
+            Microsoft.SmallBasic.Library.Sound.Stop(filePath);
             return;
         }
     }

@@ -20,133 +20,133 @@ namespace TDChecker
         /// <summary>
         /// 適時開示リストのURLを生成
         /// </summary>
-        /// <param name="pDate">yyyy/MM/dd</param>
-        /// <returns>適時開示URL</returns>
-        public static String GetTDUrl(String pDate,int pPageNo = 1)
+        /// <param name="targetDate">取得日付（yyyy/mm/dd）</param>
+        /// <param name="pageNo">ページ番号（デフォルト1ページ目）</param>
+        /// <returns></returns>
+        public static String GetTDUrl(String targetDate,int pageNo = 1)
         {
-            String retUrl = null;
-            DateTime dtDate;
+            String url = null;
+            DateTime date;
 
-            if ( DateTime.TryParse(pDate,out dtDate))
+            if ( DateTime.TryParse(targetDate,out date))
             {
-                // 適時開示フォーマット
-                //#if DEBUG
-                //                retUrl = "https://www.release.tdnet.info/inbs/";
-                //                retUrl += String.Format("I_list_{0}_{1}.html",
-                //                    pPageNo.ToString("000"),
-                //                    dtDate.ToString(Constants.YYYYMMDD)
-                //                    );
-                //#else
-                //                retUrl = "http://www5210ui.sakura.ne.jp/I_list_001_20160213.html";
-                //#endif
-                retUrl = "https://www.release.tdnet.info/inbs/";
-                retUrl += String.Format("I_list_{0}_{1}.html",
-                    pPageNo.ToString("000"),
-                    dtDate.ToString(Constants.YYYYMMDD)
+                url = "https://www.release.tdnet.info/inbs/";
+                url += String.Format("I_list_{0}_{1}.html",
+                    pageNo.ToString("000"),
+                    date.ToString(Constants.YYYYMMDD)
                     );
             }
-            Debug.WriteLine(retUrl, "接続URL");
-            return retUrl;
+            Debug.WriteLine(url, "接続URL");
+            return url;
         }
 
-        public static List<TDData> ParseDoc(HtmlAgilityPack.HtmlDocument pHtmlDoc, int pGetListNumber, String pDate )
+        /// <summary>
+        /// 取得ドキュメントのパース処理
+        /// </summary>
+        /// <param name="htmlDoc">Htmlドキュメント</param>
+        /// <param name="getListNumber">取得件数</param>
+        /// <param name="releaseDate">適時開示日</param>
+        /// <returns></returns>
+        public static List<TDData> ParseDoc(HtmlAgilityPack.HtmlDocument htmlDoc, int getListNumber, String releaseDate )
         {
             List<TDData> tdList = new List<TDData>();
             HtmlNode node;
             // 適時開示リスト検索
-            node = pHtmlDoc.GetElementbyId("main-list-table");
+            node = htmlDoc.GetElementbyId("main-list-table");
             if (node == null)
             {
                 return tdList; // 取得失敗
             }
             
-            String strHtmlText = node.OuterHtml;
-            tdList = GetTimelyDisclosureUrlList( strHtmlText, pGetListNumber, pDate);
+            String htmlText = node.OuterHtml;
+            tdList = GetTimelyDisclosureUrlList( htmlText, getListNumber, releaseDate);
             return tdList;
         }
 
         /// <summary>
         /// 取得したHTMLドキュメントから適時開示リストをとりだす
         /// </summary>
-        /// <param name="pHtmlText"></param>
-        /// <param name="pGetListNum"></param>
-        /// <param name="pDate"></param>
+        /// <param name="htmlText">Htmlドキュメント</param>
+        /// <param name="getListNum">取得件数</param>
+        /// <param name="releaseDate">適時開示日</param>
         /// <returns></returns>
-        public static List<TDData> GetTimelyDisclosureUrlList( String pHtmlText, int pGetListNum, String pDate )
+        public static List<TDData> GetTimelyDisclosureUrlList( String htmlText, int getListNum, String releaseDate )
         {
-            List<TDData> TDContentsList = new List<TDData>();
+            List<TDData> tDContentsList = new List<TDData>();
 
             // 時間計測用のタイマー
-            var timer = new System.Diagnostics.Stopwatch();
-            timer.Start();
-            Debug.WriteLine("HtmlDocument構築開始: {0:0.000}秒", timer.Elapsed.TotalSeconds);
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            Debug.WriteLine("HtmlDocument構築開始: {0:0.000}秒", stopwatch.Elapsed.TotalSeconds);
 
-            int UrlListCount = 0;
-            if (pHtmlText != null)
+            int urlListCount = 0;
+            if (htmlText != null)
             {
                 // HtmlDocumentオブジェクトを構築する
                 var htmlDoc = new HtmlAgilityPack.HtmlDocument();
-                htmlDoc.LoadHtml(pHtmlText);
-                Debug.WriteLine("HtmlDocument構築完了: {0:0.000}秒", timer.Elapsed.TotalSeconds);
+                htmlDoc.LoadHtml(htmlText);
+                Debug.WriteLine("HtmlDocument構築完了: {0:0.000}秒", stopwatch.Elapsed.TotalSeconds);
 
                 // 目的の<a>要素を全て取り出して（XPath）、
                 // そのhref属性とInnerTextを持つ匿名型オブジェクトのコレクションを作る（LINQ）
                 // ※冒頭に「using System.Linq;」の追加が必要
-                var UrlList = htmlDoc.DocumentNode.SelectNodes(@"//tbody/tr/td");
+                var urlList = htmlDoc.DocumentNode.SelectNodes(@"//tbody/tr/td");
                 // ライン分のデータ件数取得
-                int iContentsCnt = 0;
+                int contentsCnt = 0;
                 if (htmlDoc.DocumentNode.SelectNodes(@"//table/tr") != null)
                 { 
-                    iContentsCnt = htmlDoc.DocumentNode.SelectNodes(@"//table/tr")[0].SelectNodes(@" td").Count;
+                    contentsCnt = htmlDoc.DocumentNode.SelectNodes(@"//table/tr")[0].SelectNodes(@" td").Count;
                 }
                 else
                 {
-                    iContentsCnt = htmlDoc.DocumentNode.SelectNodes(@"//table/tbody/tr")[0].SelectNodes(@" td").Count;
+                    contentsCnt = htmlDoc.DocumentNode.SelectNodes(@"//table/tbody/tr")[0].SelectNodes(@" td").Count;
                 }
                 // 取得できていない場合、1つ上のノードで検索
-                if (UrlList == null)
+                if (urlList == null)
                 {
-                    UrlList= htmlDoc.DocumentNode.SelectNodes(@"//table/tr/td");
+                    urlList= htmlDoc.DocumentNode.SelectNodes(@"//table/tr/td");
                     // ライン分のデータ件数取得
-                    iContentsCnt = htmlDoc.DocumentNode.SelectNodes(@"//table/tr")[0].SelectNodes(@" td").Count;
+                    contentsCnt = htmlDoc.DocumentNode.SelectNodes(@"//table/tr")[0].SelectNodes(@" td").Count;
                 }
 
                 // リスト取得
-                TDData stTDdata;
+                TDData tDdata;
                 int tagCount = 0;
-                for(tagCount = 0, UrlListCount = 0 ; tagCount < UrlList.Count; UrlListCount++)
+                for(tagCount = 0, urlListCount = 0 ; tagCount < urlList.Count; urlListCount++)
                 {
                     // 指定件数まで取得
-                    if(pGetListNum == UrlListCount)
+                    if(getListNum == urlListCount)
                     {
                         break;
                     }
 
                     // データ設定
-                    stTDdata = new TDData();
-                    stTDdata.Date = pDate;
-                    stTDdata.Time = UrlList[tagCount].InnerText;
-                    stTDdata.Code = UrlList[tagCount + 1].InnerText.Substring(0,4);
-                    stTDdata.CompanyName = UrlList[tagCount + 2].InnerText;
-                    stTDdata.Title = UrlList[tagCount + 3].InnerText;
+                    tDdata = new TDData();
+                    tDdata.Date = releaseDate;
+                    tDdata.Time = urlList[tagCount].InnerText;
+                    tDdata.Code = urlList[tagCount + 1].InnerText.Substring(0,4);
+                    tDdata.CompanyName = urlList[tagCount + 2].InnerText;
+                    tDdata.Title = urlList[tagCount + 3].InnerText;
 
                     // リスト追加
-                    TDContentsList.Add(stTDdata);
+                    tDContentsList.Add(tDdata);
 
                     // 1ラインの項目数分加算し、次データへ
-                    tagCount += iContentsCnt;
+                    tagCount += contentsCnt;
                 }
 
-                Debug.WriteLine("タイトル取り出し完了: {0:0.000}秒", timer.Elapsed.TotalSeconds);
-                Debug.WriteLine("取得タイトル先頭{0}件（全{1}件中）", pGetListNum, UrlList.Count()/7);
+                Debug.WriteLine("タイトル取り出し完了: {0:0.000}秒", stopwatch.Elapsed.TotalSeconds);
+                Debug.WriteLine("取得タイトル先頭{0}件（全{1}件中）", getListNum, urlList.Count()/7);
             }
-            return TDContentsList;
+            return tDContentsList;
         }
 
+        /// <summary>
+        /// アプリケーションバージョン確認
+        /// </summary>
+        /// <returns></returns>
         public static Boolean AppVersionCheck()
         {
-            Boolean bRet = false;
-
             //要求するURL
             string url = "http://4doku.com/tdchk/update.php";
 
@@ -155,6 +155,7 @@ namespace TDChecker
                 (System.Net.HttpWebRequest)System.Net.WebRequest.Create(url);
 
             System.Net.HttpWebResponse webres = null;
+
             try
             {
                 //サーバーからの応答を受信するためのWebResponseを取得
@@ -182,35 +183,35 @@ namespace TDChecker
                 xml.LoadXml(html);
 
                 //ルート要素を取得する
-                System.Xml.XmlElement rootElement = xml.DocumentElement;
+                XmlElement rootElement = xml.DocumentElement;
 
                 //resタグのNodeListを取得する
-                System.Xml.XmlNodeList nodelist = rootElement.GetElementsByTagName("res");
+                XmlNodeList nodelist = rootElement.GetElementsByTagName("res");
                 //指定したタグが存在するか？
                 if (nodelist.Count > 0)
                 {
                     //指定したタグが存在したのでInnerTextプロパティで値を取得する
-                    String strNewVersion = nodelist.Item(0).InnerText;
-                    Debug.WriteLine("{0}{1}", "new version  : ", strNewVersion);
+                    String newVersion = nodelist.Item(0).InnerText;
+                    Debug.WriteLine("{0}{1}", "new version  : ", newVersion);
 
-                    if(strNewVersion != null) { 
+                    if(newVersion != null) { 
 
                         //自分自身のAssemblyを取得
                         System.Reflection.Assembly asm =
                             System.Reflection.Assembly.GetExecutingAssembly();
                         
                         //バージョンの取得
-                        System.Version ver = asm.GetName().Version;
+                        Version ver = asm.GetName().Version;
                         
                         //結果の表示
                         Debug.WriteLine("{0}{1}","this version : ", ver.ToString());
 
                         // バージョン判定
-                        int iCompare = String.Compare(nodelist.Item(0).InnerText, ver.ToString());
-                        if (iCompare > 0)
+                        int compare = String.Compare(nodelist.Item(0).InnerText, ver.ToString());
+                        if (compare > 0)
                         {
                             // 最新版あり
-                            bRet = true;
+                            return true;
                         }
                     }
                 }
@@ -239,7 +240,7 @@ namespace TDChecker
                     webres.Close();
             }
 
-            return bRet;
+            return false;
         }
     }
 }

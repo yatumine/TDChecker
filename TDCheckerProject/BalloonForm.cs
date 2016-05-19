@@ -16,9 +16,9 @@ using TDChecker.Properties;
 
 namespace TDChecker
 {
-    public partial class BalloonForm : MetroForm/* ←変更 */
+    public partial class BalloonForm : MetroForm // 変更
     {
-        /* プロパティの設定 */
+        // プロパティの設定
         private String InputTitle { get; set; }
         private String InputCode { get; set; }
         private String InputCompany { get; set; }
@@ -28,16 +28,41 @@ namespace TDChecker
         // ---------------------
         // メンバー変数
         // ---------------------
-        private int gIndex = 0;
-        private Timer gFormActivetimer;
-        private Boolean gTimerFlg = false;
-        private TDData[] gTDDataList;
-        private TDNetForm gForm;
+        private int Index = 0;
+        private Timer FormActiveTimer;
+        private Boolean TimerFlg = false;
+        private TDData[] TDDataList;
+        private TDNetForm TDNetForm;
 
-        public BalloonForm(TDNetForm pForm = null)
+        // ---------------------
+        // 定数
+        // ---------------------
+        private readonly int IndexEnd = -1;
+
+        /// <summary>
+        /// フォーム透明度
+        /// </summary>
+        public enum FormOpacity : int
+        {
+            e_Opacity_0 = 0,
+            e_Opacity_1 = 1,
+            e_Opacity_5 = 5,
+        };
+
+        /// <summary>
+        /// 遅延時間(ミリ秒)
+        /// </summary>
+        public enum Delay : int
+        {
+            e_MilliSec_1500 = 1500,
+            e_MilliSec_5000 = 5000,
+
+        };
+
+        public BalloonForm(TDNetForm form = null)
         {
             // 起動用フォーム内部保持
-            gForm = pForm;
+            TDNetForm = form;
             InitializeComponent();
             this.ShowIcon = false;
         }
@@ -49,38 +74,38 @@ namespace TDChecker
         /// <summary>
         /// バルーン呼び出し処理：単体
         /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
-        static public int ShowNotifyBaloon(String pCode, String pCompany, String pTitle)
+        /// <param name="code">銘柄コード</param>
+        /// <param name="company">会社名</param>
+        /// <param name="title">タイトル</param>
+        /// <returns>バルーン表示数</returns>
+        static public int ShowNotifyBaloon(String code, String company, String title)
         {
-            int ret = 1;
             BalloonForm f = new BalloonForm();
-            f.InputCode = pCode;
-            f.InputCompany = pCompany;
-            f.InputTitle = pTitle;
+            f.InputCode = code;
+            f.InputCompany = company;
+            f.InputTitle = title;
             f.ShowDialog();
             f.Dispose();
 
-            return ret;
+            return 1;
         }
         /// <summary>
         /// バルーン呼び出し処理：リスト
         /// </summary>
-        /// <param name="pList"></param>
-        /// <returns></returns>
-        static public int ShowNotifyBaloon(List<TDData> pList, int pBaloonCount, TDNetForm pForm = null)
+        /// <param name="tdDataList"></param>
+        /// <returns>バルーン表示数</returns>
+        static public int ShowNotifyBaloon(List<TDData> tdDataList, int baloonCount, TDNetForm tdNetForm = null)
         {
-            int ret = 1;
-            if (pList.Count != 0)
+            if (tdDataList.Count != 0)
             { 
-                BalloonForm f = new BalloonForm( pForm );
-                f.InputDispCount = pBaloonCount;
-                f.InputList = pList;
-                SoundUtility.CallSound( ( SoundUtility.SOUND_TYPE )Properties.Settings.Default.BellType );
+                BalloonForm f = new BalloonForm( tdNetForm );
+                f.InputDispCount = baloonCount;
+                f.InputList = tdDataList;
+                SoundUtility.CallSound( ( SoundUtility.SoundType )Properties.Settings.Default.BellType );
                 f.ShowDialog();
                 f.Dispose();
             }
-            return ret;
+            return 1;
         }
 
         /// <summary>
@@ -90,105 +115,87 @@ namespace TDChecker
         /// <param name="e"></param>
         private void BalloonForm_Load(object sender, EventArgs e)
         {
-            try {
+            // 初期化
+            lblCode.Text = "";
+            lblTitle.Text = "";
+            lblCompany.Text = "";
+            lblListMin.Text = "";
+            lblListMax.Text = "";
 
-                // 初期化
-                lblCode.Text = "";
-                lblTitle.Text = "";
-                lblCompany.Text = "";
-                lblListMin.Text = "";
-                lblListMax.Text = "";
-
-                // リスト存在
-                if (InputList == null)
-                {
-                    this.Close();
-                    return;
-                }
-
-                // リスト件数
-                if ( InputList.Count == 0)
-                {
-                    this.Close();
-                    return;
-                }
-
-                // キーワード使用/不使用
-                if (Settings.Default.KeyFlag == true)
-                {
-                    // キーワード検索
-                    TDData[] tddata;
-                    Boolean bKeyWordFlg;
-                    bKeyWordFlg = DataUtility.GetKeyWordRow(InputList, Settings.Default.KeyCode, out tddata);
-
-                    // メンバー変数で保持
-                    gTDDataList = tddata;
-
-                    LogPut();
-                    // キーワードがない場合全件検索
-                    if (bKeyWordFlg == false)
-                    {
-                        this.Close();
-                        return;
-                    }
-                }
-
-                if (Settings.Default.KeyFlag == false)
-                {
-                    LogPut2();
-                }
-
-                // リスト表示
-                DisplayList( gIndex);
-
-                // ウィンドウを画面右下に表示させる
-                int left = Screen.PrimaryScreen.WorkingArea.Width - this.Width;
-                int top = Screen.PrimaryScreen.WorkingArea.Height - this.Height * InputDispCount;
-                this.DesktopBounds = new Rectangle(left, top, this.Width, this.Height);
-
-                //this.DesktopLocation = new Point(700, 700);
-                this.Opacity = 0;
-                gTimerFlg = true;
-                apperTimer.Enabled = true;
-                apperTimer.Interval = 50;
-                apperTimer.Start();
-                apperTimer.Tick += new EventHandler(appear_Tick);
-
-                // タスクバー非表示
-                //this.ShowInTaskbar = false;
-
-                // ボタン状態
-                if (gIndex == 0)
-                {
-                    btnPrev.Enabled = false;
-                }
-                else
-                {
-                    btnPrev.Enabled = true;
-                }
-
-                // ボタン状態
-                if (gIndex >= InputList.Count)
-                {
-                    btnNext.Enabled = false;
-                }
-                else
-                {
-                    btnNext.Enabled = true;
-                }
-                gFormActivetimer = new Timer();
-                gFormActivetimer.Enabled = true;
-                gFormActivetimer.Interval = 50;
-                gFormActivetimer.Start();
-                gFormActivetimer.Tick += new EventHandler(active_Tick);
-
-            }
-            catch (Exception ex)
+            // リスト存在
+            if (InputList == null)
             {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.Source);
-                Debug.WriteLine(ex.TargetSite);
+                this.Close();
+                return;
             }
+
+            // リスト件数
+            if ( InputList.Count == 0)
+            {
+                this.Close();
+                return;
+            }
+
+            // キーワード使用/不使用
+            if (Settings.Default.KeyFlag == true)
+            {
+                // キーワード検索
+                TDData[] tdData;
+                Boolean keyWordFlg;
+                keyWordFlg = DataUtility.GetKeyWordRow(InputList, Settings.Default.KeyCode, out tdData);
+
+                // メンバー変数で保持
+                TDDataList = tdData;
+
+                // キーワードがない場合全件検索
+                if (keyWordFlg == false)
+                {
+                    this.Close();
+                    return;
+                }
+            }
+
+            // リスト表示
+            DisplayList(Index);
+
+            // ウィンドウを画面右下に表示させる
+            int left = Screen.PrimaryScreen.WorkingArea.Width - this.Width;
+            int top = Screen.PrimaryScreen.WorkingArea.Height - this.Height * InputDispCount;
+            this.DesktopBounds = new Rectangle(left, top, this.Width, this.Height);
+
+            this.Opacity = (int)FormOpacity.e_Opacity_0;
+            TimerFlg = true;
+            apperTimer.Enabled = true;
+            apperTimer.Interval = 50;
+            apperTimer.Start();
+            apperTimer.Tick += new EventHandler(appear_Tick);
+
+            // ボタン状態
+            if (Index == 0)
+            {
+                btnPrev.Enabled = false;
+            }
+            else
+            {
+                btnPrev.Enabled = true;
+            }
+
+            // ボタン状態
+            if (Index >= InputList.Count)
+            {
+                btnNext.Enabled = false;
+            }
+            else
+            {
+                btnNext.Enabled = true;
+            }
+
+            // タイマーの設定
+            FormActiveTimer = new Timer();
+            FormActiveTimer.Enabled = true;
+            FormActiveTimer.Interval = 50;
+            FormActiveTimer.Start();
+            FormActiveTimer.Tick += new EventHandler(active_Tick);
         }
 
         /// <summary>
@@ -198,7 +205,7 @@ namespace TDChecker
         /// <param name="e"></param>
         private void active_Tick(object sender, EventArgs e)
         {
-            setNotActiveWindow(this.Handle);
+            SetNotActiveWindow(this.Handle);
         }
 
         /// <summary>
@@ -210,16 +217,16 @@ namespace TDChecker
         {
             apperTimer.Stop();
 
-            if (this.Opacity < 1)
+            if (this.Opacity < (int)FormOpacity.e_Opacity_1)
             { 
-                this.Opacity += .1;
+                this.Opacity += (int)FormOpacity.e_Opacity_1;
                 apperTimer.Start();
             }
             else
             {
                 Debug.WriteLine("フェードイン終了");
-                await Task.Delay(5000);
-                if(gTimerFlg == true)
+                await Task.Delay((int)Delay.e_MilliSec_5000);
+                if(TimerFlg == true)
                 { 
                     // タイマー実行中ならフェードアウト処理開始
                     disolve();
@@ -247,15 +254,15 @@ namespace TDChecker
         /// <param name="e"></param>
         private void fade_Tick(object sender, EventArgs e)
         {
-            if (this.Opacity > 0)
+            if (this.Opacity > (int)FormOpacity.e_Opacity_0)
             {
-                this.Opacity -= .1;
+                this.Opacity -= (int)FormOpacity.e_Opacity_1;
             }
             else
             {
                 Debug.WriteLine("フェードアウト終了");
 
-                gFormActivetimer.Stop();
+                FormActiveTimer.Stop();
                 lowerTimer.Stop();
                 lowerTimer.Dispose();
                 this.Close();
@@ -265,45 +272,45 @@ namespace TDChecker
         /// <summary>
         /// 表示リスト変更
         /// </summary>
-        /// <param name="pIndex"></param>
-        private int DisplayList( int pIndex )
+        /// <param name="displayIndex">表示インデックス</param>
+        private int DisplayList( int displayIndex )
         {
-            int retIndex = 0;
+            int index = 0;
 
             // キーワード検索使用/不使用
             if (Settings.Default.KeyFlag == false)
             { 
                 //全件表示
-                Debug.WriteLine("pIndex[{0}/{1}]", pIndex, InputList.Count);
-                if( pIndex < 0 || pIndex >= InputList.Count)
+                Debug.WriteLine("pIndex[{0}/{1}]", displayIndex, InputList.Count);
+                if( displayIndex < 0 || displayIndex >= InputList.Count)
                 {
-                    return -1;
+                    return IndexEnd;
                 }
 
-                lblCode.Text = InputList[ pIndex ].Code;
-                lblCompany.Text = InputList[pIndex].CompanyName;
-                lblTitle.Text = InputList[pIndex].Title;
-                lblListMin.Text = (pIndex + 1).ToString();
+                lblCode.Text = InputList[ displayIndex ].Code;
+                lblCompany.Text = InputList[displayIndex].CompanyName;
+                lblTitle.Text = InputList[displayIndex].Title;
+                lblListMin.Text = (displayIndex + 1).ToString();
                 lblListMax.Text = InputList.Count.ToString();
             }
             else
             {
                 // キーワード検索 
-                int iListCount = gTDDataList.Count<TDData>();
-                Debug.WriteLine("pIndex[{0}/{1}]", pIndex, iListCount);
-                if (pIndex < 0 || pIndex >= iListCount)
+                int listCount = TDDataList.Count<TDData>();
+                Debug.WriteLine("pIndex[{0}/{1}]", displayIndex, listCount);
+                if (displayIndex < 0 || displayIndex >= listCount)
                 {
-                    retIndex = -1;
-                    return retIndex;
+                    index = IndexEnd;
+                    return index;
                 }
 
-                lblCode.Text = gTDDataList[pIndex].Code;
-                lblCompany.Text = gTDDataList[pIndex].CompanyName;
-                lblTitle.Text = gTDDataList[pIndex].Title;
-                lblListMin.Text = (pIndex + 1).ToString();
-                lblListMax.Text = iListCount.ToString();
+                lblCode.Text = TDDataList[displayIndex].Code;
+                lblCompany.Text = TDDataList[displayIndex].CompanyName;
+                lblTitle.Text = TDDataList[displayIndex].Title;
+                lblListMin.Text = (displayIndex + 1).ToString();
+                lblListMax.Text = listCount.ToString();
             }
-            return retIndex;
+            return index;
 
         }
 
@@ -314,14 +321,14 @@ namespace TDChecker
         /// <param name="e"></param>
         private void btnPrev_Click(object sender, EventArgs e)
         {
-            int retIndex = DisplayList( gIndex - 1);
-            if (retIndex != -1)
+            // インデックスを前に戻す
+            if (DisplayList(Index - 1) != IndexEnd)
             {
-                gIndex--;
+                Index--;
             }
 
             // ボタン状態
-            if (gIndex == 0)
+            if (Index == 0)
             {
                 btnPrev.Enabled = false;
             }
@@ -329,7 +336,7 @@ namespace TDChecker
             {
                 btnPrev.Enabled = true;
             }
-            if (gIndex >= InputList.Count)
+            if (Index >= InputList.Count)
             {
                 btnNext.Enabled = false;
             }
@@ -338,7 +345,7 @@ namespace TDChecker
                 btnNext.Enabled = true;
             }
 
-            this.Opacity = 5;
+            this.Opacity = (int)FormOpacity.e_Opacity_5;
 
         }
 
@@ -349,14 +356,14 @@ namespace TDChecker
         /// <param name="e"></param>
         private void btnNext_Click(object sender, EventArgs e)
         {
-            int retIndex = DisplayList( gIndex + 1);
-            if( retIndex != -1)
+            // インデックスを次に進める
+            if(DisplayList(Index + 1) != IndexEnd)
             {
-                gIndex++ ;
+                Index++ ;
             }
 
             // ボタン状態
-            if (gIndex == 0)
+            if (Index == 0)
             {
                 btnPrev.Enabled = false;
             }
@@ -364,7 +371,7 @@ namespace TDChecker
             {
                 btnPrev.Enabled = true;
             }
-            if (gIndex >= InputList.Count)
+            if (Index >= InputList.Count)
             {
                 btnNext.Enabled = false;
             }
@@ -373,27 +380,30 @@ namespace TDChecker
                 btnNext.Enabled = true;
             }
 
-            this.Opacity = 5;
+            this.Opacity = (int)FormOpacity.e_Opacity_5;
 
         }
 
-        private void allTimerStop()
+        /// <summary>
+        /// フェードイン/フェードアウトのタイマーの停止
+        /// </summary>
+        private void AllTimerStop()
         {
-            gFormActivetimer.Stop();
+            FormActiveTimer.Stop();
             apperTimer.Stop();
             lowerTimer.Stop();
 
-            gFormActivetimer.Dispose();
+            FormActiveTimer.Dispose();
             apperTimer.Dispose();
             lowerTimer.Dispose();
 
             lowerTimer.Tick -= new EventHandler(fade_Tick);
             apperTimer.Tick -= new EventHandler(appear_Tick);
-            gFormActivetimer.Tick -= new EventHandler(active_Tick);
+            FormActiveTimer.Tick -= new EventHandler(active_Tick);
 
             apperTimer.Enabled = false;
             lowerTimer.Enabled = false;
-            gFormActivetimer.Enabled = false;
+            FormActiveTimer.Enabled = false;
         }
 
         /// <summary>
@@ -405,11 +415,11 @@ namespace TDChecker
         {
             this.MouseLeave -= BalloonForm_MouseLeave;
             Debug.WriteLine("フォーカスIN");
-            this.Opacity = 1;
-            allTimerStop();
+            this.Opacity = (int)FormOpacity.e_Opacity_1;
+            AllTimerStop();
             this.TopMost = true;
-            gTimerFlg = false;
-            await Task.Delay(1500);
+            TimerFlg = false;
+            await Task.Delay((int)Delay.e_MilliSec_1500);
             this.MouseLeave += BalloonForm_MouseLeave;
 
         }
@@ -435,17 +445,20 @@ namespace TDChecker
             disolve();
         }
 
-        // アクティブ化されないスタイル設定
-        private void setNotActiveWindow(IntPtr hWnd)
+        /// <summary>
+        /// アクティブ化されないスタイル設定
+        /// </summary>
+        /// <param name="hWnd"></param>
+        private void SetNotActiveWindow(IntPtr hWnd)
         {
             // 現在のスタイルを取得
-            UInt32 unSyle = GetWindowLong(hWnd, GWL.EXSTYLE);
+            UInt32 style = GetWindowLong(hWnd, GWL.EXSTYLE);
 
             // キャプションのスタイルを削除
-            unSyle = (unSyle | WS_EX_NOACTIVATE);
+            style = (style | WS_EX_NOACTIVATE);
 
             // スタイルを反映
-            UInt32 unret = SetWindowLong(hWnd, GWL.EXSTYLE, unSyle);
+            UInt32 unret = SetWindowLong(hWnd, GWL.EXSTYLE, style);
 
             // ウィンドウを再描画
             SetWindowPos(hWnd, new IntPtr(-1),
@@ -462,7 +475,40 @@ namespace TDChecker
         /// <param name="e"></param>
         private void lblTitle_Click(object sender, EventArgs e)
         {
-            // ブラウザ起動（PDF画面）
+            // TODO:ブラウザ起動（PDF画面）処理追加予定
+        }
+
+        /// <summary>
+        /// ダブルクリック
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Form_DoubleClick(object sender, EventArgs e)
+        {
+            if (TDNetForm == null || TDNetForm.IsDisposed == true)
+            {
+                return;
+            }
+
+            if (TDNetForm.Created == false)
+            {
+                if (TDNetForm.InvokeRequired)
+                {
+                    this.Invoke(new MethodInvoker(delegate
+                    {
+                        TDNetForm.Show();
+                        // フォームアクティブ
+                        TDNetForm.Activate();
+                    }));
+                }
+                else
+                {
+                    TDNetForm.Show();
+                    // フォームアクティブ
+                    TDNetForm.Activate();
+                }
+            }
+
         }
 
         #region Win32API
@@ -506,100 +552,6 @@ namespace TDChecker
         IntPtr hWndInsertAfter,
         int x, int y, int width, int height, SWP flags);
 
-
-
         #endregion
-        /// <summary>
-        /// ダブルクリック
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Form_DoubleClick(object sender, EventArgs e)
-        {
-            if (gForm == null || gForm.IsDisposed == true)
-            {
-                return;
-            }
-
-            if (gForm.Created == false)
-            {
-                if (gForm.InvokeRequired)
-                {
-                    this.Invoke(new MethodInvoker(delegate
-                    {
-                        gForm.Show();
-                        // フォームアクティブ
-                        gForm.Activate();
-                    }));
-                }
-                else
-                {
-                    gForm.Show();
-                    // フォームアクティブ
-                    gForm.Activate();
-                }
-            }
-
-        }
-
-        /// <summary>
-        /// ログファイル出力
-        /// </summary>
-        private void LogPut()
-        {
-            try {
-
-                if (gTDDataList == null)
-                {
-                    return;
-                }
-
-                LogUtility.WriteTraceLog(" ======== リスト通知 ======== ");
-                int iListCount = gTDDataList.Count<TDData>();
-                for (int cnt = 0; cnt < iListCount; cnt++)
-                {
-                    LogUtility.WriteTraceLog("{0},{1},{2},{3}",
-                        gTDDataList[cnt].Time,
-                        gTDDataList[cnt].Code,
-                        gTDDataList[cnt].CompanyName,
-                        gTDDataList[cnt].Title
-                        );
-                }
-            }
-            catch (Exception)
-            {
-                return;
-            }
-        }
-
-        /// <summary>
-        /// ログファイル出力
-        /// </summary>
-        private void LogPut2()
-        {
-            try
-            {
-                if (gTDDataList == null)
-                {
-                    return;
-                }
-
-                LogUtility.WriteTraceLog(" ======== リスト通知 ======== ");
-                int iListCount = InputList.Count;
-                for (int cnt = 0; cnt < iListCount; cnt++)
-                {
-                    LogUtility.WriteTraceLog("{0},{1},{2},{3}",
-                        InputList[cnt].Time,
-                        InputList[cnt].Code,
-                        InputList[cnt].CompanyName,
-                        InputList[cnt].Title
-                        );
-                }
-            }
-            catch (Exception)
-            {
-                return;
-            }
-        }
     }
 }

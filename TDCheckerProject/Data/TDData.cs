@@ -26,7 +26,7 @@ namespace COMMON.Data
         public int Value { get; set; }              // 読み込み間隔数値データ
 
         /// <summary>
-        /// 読み込み間隔データ設定
+        /// 読み込み間隔データ設定コンストラクタ
         /// </summary>
         /// <param name="cycle">表示間隔</param>
         /// <param name="value">間隔数値</param>

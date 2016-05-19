@@ -4,13 +4,18 @@ using System.Windows.Forms;
 
 namespace TDChecker.Utility
 {
+    /// <summary>
+    /// 数値テキストボックス
+    /// </summary>
     public partial class NumericTextBox : TextBox
     {
         private TextBox textBox1;
         bool allowSpace = false;
 
-        // Restricts the entry of characters to digits (including hex), the negative sign,
-        // the decimal point, and editing keystrokes (backspace).
+        /// <summary>
+        /// キー入力判定
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnKeyPress(KeyPressEventArgs e)
         {
             base.OnKeyPress(e);
@@ -35,19 +40,13 @@ namespace TDChecker.Utility
             {
                 // Backspace key is OK
             }
-            //    else if ((ModifierKeys & (Keys.Control | Keys.Alt)) != 0)
-            //    {
-            //     // Let the edit control handle control and alt key combinations
-            //    }
             else if (this.allowSpace && e.KeyChar == ' ')
             {
 
             }
             else
             {
-                // Consume this invalid key and beep
                 e.Handled = true;
-                //    MessageBeep();
             }
         }
 

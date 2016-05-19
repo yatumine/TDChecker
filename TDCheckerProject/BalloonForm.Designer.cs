@@ -44,9 +44,10 @@
             // 
             // lblTitle
             // 
-            this.lblTitle.Location = new System.Drawing.Point(25, 51);
+            this.lblTitle.Location = new System.Drawing.Point(46, 89);
+            this.lblTitle.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(230, 50);
+            this.lblTitle.Size = new System.Drawing.Size(422, 88);
             this.lblTitle.TabIndex = 0;
             this.lblTitle.Text = "title";
             this.lblTitle.Click += new System.EventHandler(this.lblTitle_Click);
@@ -54,18 +55,20 @@
             // lblCode
             // 
             this.lblCode.AutoSize = true;
-            this.lblCode.Location = new System.Drawing.Point(13, 21);
+            this.lblCode.Location = new System.Drawing.Point(24, 37);
+            this.lblCode.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.lblCode.Name = "lblCode";
-            this.lblCode.Size = new System.Drawing.Size(29, 12);
+            this.lblCode.Size = new System.Drawing.Size(53, 21);
             this.lblCode.TabIndex = 1;
             this.lblCode.Text = "code";
             // 
             // lblCompany
             // 
             this.lblCompany.AutoSize = true;
-            this.lblCompany.Location = new System.Drawing.Point(58, 21);
+            this.lblCompany.Location = new System.Drawing.Point(106, 37);
+            this.lblCompany.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.lblCompany.Name = "lblCompany";
-            this.lblCompany.Size = new System.Drawing.Size(75, 12);
+            this.lblCompany.Size = new System.Drawing.Size(130, 21);
             this.lblCompany.TabIndex = 2;
             this.lblCompany.Text = "compay name";
             // 
@@ -76,9 +79,10 @@
             this.btnNext.Cursor = System.Windows.Forms.Cursors.Default;
             this.btnNext.FlatAppearance.BorderSize = 0;
             this.btnNext.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnNext.Location = new System.Drawing.Point(238, 104);
+            this.btnNext.Location = new System.Drawing.Point(436, 182);
+            this.btnNext.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.btnNext.Name = "btnNext";
-            this.btnNext.Size = new System.Drawing.Size(17, 20);
+            this.btnNext.Size = new System.Drawing.Size(31, 35);
             this.btnNext.TabIndex = 4;
             this.btnNext.UseVisualStyleBackColor = true;
             this.btnNext.Click += new System.EventHandler(this.btnNext_Click);
@@ -89,9 +93,10 @@
             this.btnPrev.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.btnPrev.FlatAppearance.BorderSize = 0;
             this.btnPrev.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnPrev.Location = new System.Drawing.Point(25, 104);
+            this.btnPrev.Location = new System.Drawing.Point(46, 182);
+            this.btnPrev.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.btnPrev.Name = "btnPrev";
-            this.btnPrev.Size = new System.Drawing.Size(17, 20);
+            this.btnPrev.Size = new System.Drawing.Size(31, 35);
             this.btnPrev.TabIndex = 3;
             this.btnPrev.UseVisualStyleBackColor = true;
             this.btnPrev.Click += new System.EventHandler(this.btnPrev_Click);
@@ -99,35 +104,38 @@
             // lblListMax
             // 
             this.lblListMax.AutoSize = true;
-            this.lblListMax.Location = new System.Drawing.Point(141, 108);
+            this.lblListMax.Location = new System.Drawing.Point(259, 189);
+            this.lblListMax.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.lblListMax.Name = "lblListMax";
-            this.lblListMax.Size = new System.Drawing.Size(26, 12);
+            this.lblListMax.Size = new System.Drawing.Size(46, 21);
             this.lblListMax.TabIndex = 5;
             this.lblListMax.Text = "Max";
             // 
             // lblListMin
             // 
             this.lblListMin.AutoSize = true;
-            this.lblListMin.Location = new System.Drawing.Point(94, 108);
+            this.lblListMin.Location = new System.Drawing.Point(172, 189);
+            this.lblListMin.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.lblListMin.Name = "lblListMin";
-            this.lblListMin.Size = new System.Drawing.Size(23, 12);
+            this.lblListMin.Size = new System.Drawing.Size(41, 21);
             this.lblListMin.TabIndex = 6;
             this.lblListMin.Text = "Min";
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(123, 108);
+            this.label1.Location = new System.Drawing.Point(226, 189);
+            this.label1.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(11, 12);
+            this.label1.Size = new System.Drawing.Size(21, 21);
             this.label1.TabIndex = 7;
             this.label1.Text = "/";
             // 
             // BalloonForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 21F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 139);
+            this.ClientSize = new System.Drawing.Size(521, 243);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.lblListMin);
             this.Controls.Add(this.lblListMax);
@@ -136,9 +144,11 @@
             this.Controls.Add(this.lblCompany);
             this.Controls.Add(this.lblCode);
             this.Controls.Add(this.lblTitle);
+            this.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "BalloonForm";
+            this.Padding = new System.Windows.Forms.Padding(37, 105, 37, 35);
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;

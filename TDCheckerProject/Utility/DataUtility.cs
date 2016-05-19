@@ -8,83 +8,84 @@ namespace COMMON.Utility
 {
     class DataUtility
     {
-        static public Boolean GetKeyWordRow(List<TDData> pList,String pKeyWord, out TDData[] pRet)
+        static public Boolean GetKeyWordRow(List<TDData> tdDataList,String keyWord, out TDData[] outTDData)
         {
-            TDData[] dataBuff;
-            List<TDData> lstBuff = new List<TDData>();
-            Boolean bRet = false;
-            String[] strKeyWord = pKeyWord.Split(',');
-            int cnt;
+            TDData[] tdDataBuff;
+            List<TDData> tdDatelistBuff = new List<TDData>();
+            String[] keyWordList = keyWord.Split(',');
+            int keyWordCount;
 
             // 初期化
-            pRet = null;
+            outTDData = null;
 
             // KeyWordチェック
-            if (pKeyWord == null || pKeyWord == "")
+            if (keyWord == null || keyWord == "")
             {
-                return bRet;
+                return false;
             }
 
-            for (cnt = 0; cnt < strKeyWord.Length; cnt++)
+            for (keyWordCount = 0; keyWordCount < keyWordList.Length; keyWordCount++)
             {
-                dataBuff = (
-                    from row in pList
+                tdDataBuff = (
+                    from row in tdDataList
                     let columnID = row.Code
-                    where columnID == strKeyWord[cnt]
+                    where columnID == keyWordList[keyWordCount]
                     orderby columnID
                     select row
                 ).ToArray();
 
-                lstBuff.AddRange(new List<TDData>(dataBuff));
+                tdDatelistBuff.AddRange(new List<TDData>(tdDataBuff));
             }
 
-            pRet = lstBuff.ToArray();
+            outTDData = tdDatelistBuff.ToArray();
 
             // 取得リスト数
-            int iListCount = pRet.Count<TDData>();
-            if (iListCount == 0)
+            if (outTDData.Count<TDData>() == 0)
             {
-                bRet = false;
-            }
-            else
-            {
-                bRet = true;
+                return false;
             }
 
-            return bRet;
+            return true;
         }
 
-        static public DataRow[] GetKeyWordData(DataTable pDataTable,String pColumnID, String pKeyWord)
+        /// <summary>
+        /// データテーブルから、キーワードに一致したデータを取得する
+        /// </summary>
+        /// <param name="dataTable">データテーブル</param>
+        /// <param name="columnIDName">カラムID名</param>
+        /// <param name="keyWord">キーワード</param>
+        /// <returns></returns>
+        static public DataRow[] GetKeyWordData(DataTable dataTable,String columnIDName, String keyWord)
         {
             
             // KeyWordチェック
-            if (pKeyWord == null || pKeyWord == "")
+            if (keyWord == null || keyWord == "")
             {
                 return null;
             }
 
             // KeyWordの抽出
-            String[] strKeyWordList = pKeyWord.Split(',');
-            List<DataRow> lstRet = new List<DataRow>();
+            String[] keyWordList = keyWord.Split(',');
+            List<DataRow> resultList = new List<DataRow>();
 
             DataRow[] rows = null;
-            for (int cnt = 0; cnt < strKeyWordList.Length; cnt++)
+            for (int keyWordListCnt = 0; keyWordListCnt < keyWordList.Length; keyWordListCnt++)
             {
                 // KeyWordで検索
                 rows = (
-                    from row in pDataTable.AsEnumerable()
-                    let columnID = row.Field<string>(pColumnID)
-                    where columnID == strKeyWordList[cnt]
+                    from row in dataTable.AsEnumerable()
+                    let columnID = row.Field<string>(columnIDName)
+                    where columnID == keyWordList[keyWordListCnt]
                     orderby columnID
                     select row
                 ).ToArray();
 
                 // 一時的にリストへ蓄積
-                lstRet.AddRange(new List<DataRow>(rows));
+                resultList.AddRange(new List<DataRow>(rows));
             }
 
             // DataRowを返却
-            return lstRet.ToArray();
+            return resultList.ToArray();
         }
 
     }

@@ -14,7 +14,7 @@ namespace TDChecker
         // --------------------
         // メンバ変数
         // --------------------
-        private Timer timer;
+        private Timer MonitorTimer;
 
         /// <summary>
         /// コンストラクタ
@@ -23,31 +23,36 @@ namespace TDChecker
         {
             
         }
-
-        public WebTimer(System.ComponentModel.ISynchronizeInvoke pThis, double pInterval, ElapsedEventHandler pEvent)
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="thisObj">呼び出し元オブジェクト</param>
+        /// <param name="interval">インターバル</param>
+        /// <param name="eventHdl">実行対象イベントハンドラ</param>
+        public WebTimer(System.ComponentModel.ISynchronizeInvoke thisObj, double interval, ElapsedEventHandler eventHdl)
         {
-            this.timer = new Timer();
+            this.MonitorTimer = new Timer();
             // イベントをハンドル.
-            this.timer.Elapsed += pEvent;
+            this.MonitorTimer.Elapsed += eventHdl;
             // インターバル時間設定
-            this.timer.Interval = pInterval;
+            this.MonitorTimer.Interval = interval;
             // マーシャリング設定
-            this.timer.SynchronizingObject = pThis;
+            this.MonitorTimer.SynchronizingObject = thisObj;
         }
 
         public void Dispose()
         {
-            ((IDisposable)timer).Dispose();
+            ((IDisposable)MonitorTimer).Dispose();
         }
 
         /// <summary>
         /// インターバル設定
         /// </summary>
-        /// <param name="pInterval"></param>
+        /// <param name="interval"></param>
         /// <returns></returns>
-        public bool SetInterval(double pInterval)
+        public bool SetInterval(double interval)
         {
-            this.timer.Interval = pInterval;
+            this.MonitorTimer.Interval = interval;
             return true;
         }
 
@@ -56,13 +61,13 @@ namespace TDChecker
         /// </summary>
         public void Start()
         {
-            this.timer.Start();
+            this.MonitorTimer.Start();
         }
 
         public bool Start(double pInterval)
         {
-            this.timer.Interval = pInterval;
-            this.timer.Start();
+            this.MonitorTimer.Interval = pInterval;
+            this.MonitorTimer.Start();
 
             return true;
         }
@@ -73,7 +78,7 @@ namespace TDChecker
         /// <returns></returns>
         public bool Stop()
         {
-            this.timer.Stop();
+            this.MonitorTimer.Stop();
             return true;
         }
     }

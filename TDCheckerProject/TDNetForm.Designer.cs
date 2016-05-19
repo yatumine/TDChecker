@@ -36,7 +36,7 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.mainTimer = new System.Windows.Forms.Timer(this.components);
             this.lblClock = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.mGridMain = new MetroFramework.Controls.MetroGrid();
@@ -69,10 +69,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.tdDataListKey)).BeginInit();
             this.SuspendLayout();
             // 
-            // timer1
+            // mainTimer
             // 
-            this.timer1.Interval = 1;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            this.mainTimer.Interval = 1;
+            this.mainTimer.Tick += new System.EventHandler(this.mainTimer_Tick);
             // 
             // lblClock
             // 
@@ -80,9 +80,10 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lblClock.AutoSize = true;
-            this.lblClock.Location = new System.Drawing.Point(33, 60);
+            this.lblClock.Location = new System.Drawing.Point(61, 105);
+            this.lblClock.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.lblClock.Name = "lblClock";
-            this.lblClock.Size = new System.Drawing.Size(121, 12);
+            this.lblClock.Size = new System.Drawing.Size(208, 21);
             this.lblClock.TabIndex = 1;
             this.lblClock.Text = "yyyy/mm/dd hh:mm:ss";
             // 
@@ -93,9 +94,10 @@
             this.button1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.button1.FlatAppearance.BorderSize = 0;
             this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button1.Location = new System.Drawing.Point(565, 6);
+            this.button1.Location = new System.Drawing.Point(1036, 10);
+            this.button1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(20, 22);
+            this.button1.Size = new System.Drawing.Size(37, 38);
             this.button1.TabIndex = 3;
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
@@ -141,7 +143,8 @@
             this.mGridMain.EnableHeadersVisualStyles = false;
             this.mGridMain.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.mGridMain.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.mGridMain.Location = new System.Drawing.Point(35, 92);
+            this.mGridMain.Location = new System.Drawing.Point(64, 161);
+            this.mGridMain.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.mGridMain.Name = "mGridMain";
             this.mGridMain.ReadOnly = true;
             this.mGridMain.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
@@ -157,7 +160,7 @@
             this.mGridMain.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this.mGridMain.RowTemplate.Height = 21;
             this.mGridMain.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.mGridMain.Size = new System.Drawing.Size(597, 347);
+            this.mGridMain.Size = new System.Drawing.Size(1095, 607);
             this.mGridMain.TabIndex = 4;
             this.mGridMain.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.mGrid_CellMouseClick);
             // 
@@ -221,9 +224,10 @@
             // mBtnFilter
             // 
             this.mBtnFilter.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.mBtnFilter.Location = new System.Drawing.Point(557, 49);
+            this.mBtnFilter.Location = new System.Drawing.Point(1021, 86);
+            this.mBtnFilter.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.mBtnFilter.Name = "mBtnFilter";
-            this.mBtnFilter.Size = new System.Drawing.Size(75, 23);
+            this.mBtnFilter.Size = new System.Drawing.Size(138, 40);
             this.mBtnFilter.TabIndex = 5;
             this.mBtnFilter.Text = "フィルター";
             this.mBtnFilter.UseCustomBackColor = true;
@@ -238,16 +242,18 @@
             // 
             // 
             this.mtxtKeyWord.CustomButton.Image = null;
-            this.mtxtKeyWord.CustomButton.Location = new System.Drawing.Point(95, 1);
+            this.mtxtKeyWord.CustomButton.Location = new System.Drawing.Point(325, 4);
+            this.mtxtKeyWord.CustomButton.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.mtxtKeyWord.CustomButton.Name = "";
-            this.mtxtKeyWord.CustomButton.Size = new System.Drawing.Size(21, 21);
+            this.mtxtKeyWord.CustomButton.Size = new System.Drawing.Size(64, 61);
             this.mtxtKeyWord.CustomButton.Style = MetroFramework.MetroColorStyle.Blue;
             this.mtxtKeyWord.CustomButton.TabIndex = 1;
             this.mtxtKeyWord.CustomButton.Theme = MetroFramework.MetroThemeStyle.Light;
             this.mtxtKeyWord.CustomButton.UseSelectable = true;
             this.mtxtKeyWord.CustomButton.Visible = false;
             this.mtxtKeyWord.Lines = new string[0];
-            this.mtxtKeyWord.Location = new System.Drawing.Point(434, 49);
+            this.mtxtKeyWord.Location = new System.Drawing.Point(796, 86);
+            this.mtxtKeyWord.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.mtxtKeyWord.MaxLength = 32767;
             this.mtxtKeyWord.Name = "mtxtKeyWord";
             this.mtxtKeyWord.PasswordChar = '\0';
@@ -255,7 +261,7 @@
             this.mtxtKeyWord.SelectedText = "";
             this.mtxtKeyWord.SelectionLength = 0;
             this.mtxtKeyWord.SelectionStart = 0;
-            this.mtxtKeyWord.Size = new System.Drawing.Size(117, 23);
+            this.mtxtKeyWord.Size = new System.Drawing.Size(215, 40);
             this.mtxtKeyWord.TabIndex = 6;
             this.mtxtKeyWord.UseSelectable = true;
             this.mtxtKeyWord.WaterMarkColor = System.Drawing.Color.FromArgb(((int)(((byte)(109)))), ((int)(((byte)(109)))), ((int)(((byte)(109)))));
@@ -303,7 +309,8 @@
             this.mGridKeyWord.EnableHeadersVisualStyles = false;
             this.mGridKeyWord.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.mGridKeyWord.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.mGridKeyWord.Location = new System.Drawing.Point(35, 92);
+            this.mGridKeyWord.Location = new System.Drawing.Point(64, 161);
+            this.mGridKeyWord.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.mGridKeyWord.Name = "mGridKeyWord";
             this.mGridKeyWord.ReadOnly = true;
             this.mGridKeyWord.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
@@ -319,7 +326,7 @@
             this.mGridKeyWord.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this.mGridKeyWord.RowTemplate.Height = 21;
             this.mGridKeyWord.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.mGridKeyWord.Size = new System.Drawing.Size(597, 347);
+            this.mGridKeyWord.Size = new System.Drawing.Size(1095, 607);
             this.mGridKeyWord.TabIndex = 7;
             this.mGridKeyWord.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.mGrid_CellMouseClick);
             // 
@@ -384,9 +391,10 @@
             // 
             this.lblListNum.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lblListNum.AutoSize = true;
-            this.lblListNum.Location = new System.Drawing.Point(33, 449);
+            this.lblListNum.Location = new System.Drawing.Point(61, 786);
+            this.lblListNum.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.lblListNum.Name = "lblListNum";
-            this.lblListNum.Size = new System.Drawing.Size(53, 12);
+            this.lblListNum.Size = new System.Drawing.Size(95, 21);
             this.lblListNum.TabIndex = 8;
             this.lblListNum.Text = "リスト件数";
             // 
@@ -394,17 +402,18 @@
             // 
             this.lblStatus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lblStatus.ForeColor = System.Drawing.SystemColors.ControlDark;
-            this.lblStatus.Location = new System.Drawing.Point(166, 442);
+            this.lblStatus.Location = new System.Drawing.Point(304, 774);
+            this.lblStatus.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(466, 21);
+            this.lblStatus.Size = new System.Drawing.Size(854, 37);
             this.lblStatus.TabIndex = 9;
             this.lblStatus.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // TDNetForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 21F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(669, 470);
+            this.ClientSize = new System.Drawing.Size(1227, 822);
             this.Controls.Add(this.lblStatus);
             this.Controls.Add(this.lblListNum);
             this.Controls.Add(this.mGridKeyWord);
@@ -415,8 +424,10 @@
             this.Controls.Add(this.lblClock);
             this.ForeColor = System.Drawing.SystemColors.ControlText;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MinimumSize = new System.Drawing.Size(594, 434);
+            this.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.MinimumSize = new System.Drawing.Size(1089, 760);
             this.Name = "TDNetForm";
+            this.Padding = new System.Windows.Forms.Padding(37, 105, 37, 35);
             this.Text = "TDChecker";
             this.Load += new System.EventHandler(this.TDNetForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.mGridMain)).EndInit();
@@ -432,7 +443,7 @@
 
         #endregion
         private TDDataList tDDataList;
-        private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Timer mainTimer;
         private System.Windows.Forms.BindingSource tDNetBindingSource;
         private System.Windows.Forms.Label lblClock;
         private System.Windows.Forms.Button button1;

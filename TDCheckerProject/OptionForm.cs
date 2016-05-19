@@ -9,13 +9,14 @@ using COMMON.Data;
 using System.Data;
 using System.Collections.Generic;
 using COMMON.Utility;
+using System.Diagnostics;
 
 namespace TDChecker
 {
     public partial class OptionForm : MetroForm/* ←変更 */
     {
-        // クラス内関数
-        private static Boolean bInitializeFlg = false;
+        // メンバ変数
+        private static Boolean InitializeFlg = false;
 
         /// <summary>
         /// コンストラクタ
@@ -32,9 +33,9 @@ namespace TDChecker
         private void OptionForm_Load(object sender, EventArgs e)
         {
             // 初期化
-            bInitializeFlg = true;
+            InitializeFlg = true;
             InitializeOption();
-            bInitializeFlg = false;
+            InitializeFlg = false;
         }
 
         /// <summary>
@@ -84,21 +85,21 @@ namespace TDChecker
 
             if(mTxtMusicFilePath.Text != null)
             {
-                openFileDialog1.InitialDirectory = mTxtMusicFilePath.Text;
+                openFileDialog.InitialDirectory = mTxtMusicFilePath.Text;
             }
 
             // ダイアログを表示し、戻り値が [OK] の場合は、選択したファイルを表示する
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 // 選択されたファイル名を設定
-                mTxtMusicFilePath.Text = openFileDialog1.FileName;
+                mTxtMusicFilePath.Text = openFileDialog.FileName;
             }
 
-            // 不要になった時点で破棄する (正しくは オブジェクトの破棄を保証する を参照)
-            openFileDialog1.Dispose();
+            // 不要になった時点で破棄する
+            openFileDialog.Dispose();
 
             Settings.Default.BellSoundFile = mTxtMusicFilePath.Text;
-            SoundUtility.PlayTimerAsync(Settings.Default.BellSoundFile, 10);
+            SoundUtility.PlayTimerAsync(Settings.Default.BellSoundFile, SoundUtility.PlaySec.e_10_Sec);
 
         }
         /// <summary>
@@ -112,22 +113,22 @@ namespace TDChecker
             // Bellラジオボタン選択
             switch (Settings.Default.BellType)
             {
-                case Constants.BELL_NO_SOUND:
+                case Constants.BellNoSound:
                     mTxtMusicFilePath.Enabled = false;
                     btnMusicReference.Enabled = false;
                     break;
-                case Constants.BELL_PLAY_CHIME:
-                    Settings.Default.BellType = Constants.BELL_PLAY_CHIME;
+                case Constants.BellPlayChime:
+                    Settings.Default.BellType = Constants.BellPlayChime;
                     mTxtMusicFilePath.Enabled = false;
                     btnMusicReference.Enabled = false;
                     break;
-                case Constants.BELL_PLAY_BELL_RING:
-                    Settings.Default.BellType = Constants.BELL_PLAY_BELL_RING;
+                case Constants.BellPlayBellRing:
+                    Settings.Default.BellType = Constants.BellPlayBellRing;
                     mTxtMusicFilePath.Enabled = false;
                     btnMusicReference.Enabled = false;
                     break;
-                case Constants.BELL_PLAY_MUSIC:
-                    Settings.Default.BellType = Constants.BELL_PLAY_MUSIC;
+                case Constants.BellPlayMusic:
+                    Settings.Default.BellType = Constants.BellPlayMusic;
                     mTxtMusicFilePath.Enabled = true;
                     btnMusicReference.Enabled = true;
                     break;
@@ -139,16 +140,16 @@ namespace TDChecker
             {
                 if (selectCtl is RadioButton)
                 {
-                    RadioButton rdBell = (RadioButton)selectCtl;
-                    short srtSelectNo = short.Parse(rdBell.Name.Substring((rdBell.Name.Length - 1)));
+                    RadioButton radioBtnBell = (RadioButton)selectCtl;
+                    short selectNo = short.Parse(radioBtnBell.Name.Substring((radioBtnBell.Name.Length - 1)));
 
-                    if (srtSelectNo == Settings.Default.BellType)
+                    if (selectNo == Settings.Default.BellType)
                     {
-                        rdBell.Checked = true;
+                        radioBtnBell.Checked = true;
                     }
                     else
                     {
-                        rdBell.Checked = false;
+                        radioBtnBell.Checked = false;
                     }
                 }
             }
@@ -169,40 +170,40 @@ namespace TDChecker
         /// <param name="e"></param>
         private void BellOptionCheckChanged(object sender, EventArgs e)
         {
-            if (bInitializeFlg)
+            if (InitializeFlg)
             {
                 return;
             }
             // BellSoundOption（grpBellSound）の選択項目を取得
             foreach (Control selectCtl in grpBellSound.Controls)
             {
-                short srtSelectNo = 0;
+                short selectNo = 0;
                 if (selectCtl is RadioButton && ((RadioButton)selectCtl).Checked)
                 {
-                    RadioButton rdBell = (RadioButton)selectCtl;
-                    srtSelectNo = short.Parse(rdBell.Name.Substring((rdBell.Name.Length - 1)));
-                    switch (srtSelectNo)
+                    RadioButton radioBtnBell = (RadioButton)selectCtl;
+                    selectNo = short.Parse(radioBtnBell.Name.Substring((radioBtnBell.Name.Length - 1)));
+                    switch (selectNo)
                     {
-                        case Constants.BELL_NO_SOUND:
-                            Settings.Default.BellType = Constants.BELL_NO_SOUND;
+                        case Constants.BellNoSound:
+                            Settings.Default.BellType = Constants.BellNoSound;
                             mTxtMusicFilePath.Enabled = false;
                             btnMusicReference.Enabled = false;
                             break;
-                        case Constants.BELL_PLAY_CHIME:
-                            Settings.Default.BellType = Constants.BELL_PLAY_CHIME;
+                        case Constants.BellPlayChime:
+                            Settings.Default.BellType = Constants.BellPlayChime;
                             Microsoft.SmallBasic.Library.Sound.PlayChimes();
                             mTxtMusicFilePath.Enabled = false;
                             btnMusicReference.Enabled = false;
                             break;
-                        case Constants.BELL_PLAY_BELL_RING:
-                            Settings.Default.BellType = Constants.BELL_PLAY_BELL_RING;
+                        case Constants.BellPlayBellRing:
+                            Settings.Default.BellType = Constants.BellPlayBellRing;
                             Microsoft.SmallBasic.Library.Sound.PlayBellRing();
                             mTxtMusicFilePath.Enabled = false;
                             btnMusicReference.Enabled = false;
                             break;
-                        case Constants.BELL_PLAY_MUSIC:
-                            Settings.Default.BellType = Constants.BELL_PLAY_MUSIC;
-                            SoundUtility.PlayTimerAsync(Settings.Default.BellSoundFile, 10);
+                        case Constants.BellPlayMusic:
+                            Settings.Default.BellType = Constants.BellPlayMusic;
+                            SoundUtility.PlayTimerAsync(Settings.Default.BellSoundFile, SoundUtility.PlaySec.e_10_Sec);
                             mTxtMusicFilePath.Enabled = true;
                             btnMusicReference.Enabled = true;
                             break;
@@ -235,7 +236,7 @@ namespace TDChecker
                 }
                 else
                 {
-                    Settings.Default.ReadListNum = Constants.DEFAULT_READLISTNUM;
+                    Settings.Default.ReadListNum = Constants.DefaultReadingNum;
                 }
             }
         }
@@ -251,7 +252,7 @@ namespace TDChecker
             // パラメータチェック
             if (cmb.SelectedItem == null) return;
 
-            //// 数値変換チェック
+            // 数値変換チェック
             int result;
             if (int.TryParse(cmb.SelectedItem.ToString(), out result))
             {
@@ -264,10 +265,10 @@ namespace TDChecker
                 else
                 {
                     // 時,分,秒
-                    Settings.Default.ReadCycle = new TimeSpan(0, Constants.DEFAULT_READCYCLE, 0);
+                    Settings.Default.ReadCycle = new TimeSpan(0, Constants.DefaultReadCycle, 0);
                 }
             }
-            Console.WriteLine("次回読み込み：{0}", ClockUtility.GetReadTime(Settings.Default.ReadCycle));
+            Debug.WriteLine("次回読み込み：{0}", ClockUtility.GetReadTime(Settings.Default.ReadCycle));
             lblNextRead.Text = ClockUtility.IsNextTime;
         }
 
@@ -277,32 +278,36 @@ namespace TDChecker
         private void SetCycleCmb()
         {
             // 読み込み間隔データ生成
-            List<ReadCycle> rc = SetCycle();
+            List<ReadCycle> readCycle = SetCycle();
 
             // -----------------------------------
             // 追加レコード作製
             // -----------------------------------
-            for (int cnt = 0; cnt < rc.Count; cnt++)
+            for (int recordCnt = 0; recordCnt < readCycle.Count; recordCnt++)
             {
                 // 値セット
-                cmbCycle.Items.Add(rc[cnt]);
+                cmbCycle.Items.Add(readCycle[recordCnt]);
             }
         }
 
+        /// <summary>
+        /// 読込間隔（分）
+        /// </summary>
+        /// <returns></returns>
         private List<ReadCycle> SetCycle()
         {
             // 初期化
-            List<ReadCycle> rc = new List<ReadCycle>();
-            rc.Add(new ReadCycle("1", 1));
-            rc.Add(new ReadCycle("5", 5));
-            rc.Add(new ReadCycle("10", 10));
-            rc.Add(new ReadCycle("30", 30));
-            rc.Add(new ReadCycle("60", 60));
+            List<ReadCycle> readCycle = new List<ReadCycle>();
+            readCycle.Add(new ReadCycle("1", 1));
+            readCycle.Add(new ReadCycle("5", 5));
+            readCycle.Add(new ReadCycle("10", 10));
+            readCycle.Add(new ReadCycle("30", 30));
+            readCycle.Add(new ReadCycle("60", 60));
 
-            return rc;
+            return readCycle;
         }
 
-        private void openFileDialog1_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
+        private void openFileDialog_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
         {
 
         }

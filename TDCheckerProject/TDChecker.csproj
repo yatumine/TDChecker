@@ -70,7 +70,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <OutputPath>..\..\Release\TDCheker\x32\</OutputPath>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
@@ -81,7 +81,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <OutputPath>..\..\Release\TDCheker\x64\</OutputPath>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
@@ -175,7 +175,6 @@
     </Compile>
     <Compile Include="Utility\SoundUtility.cs" />
     <Compile Include="Utility\HttpUtility.cs" />
-    <Compile Include="Utility\LogUtility.cs" />
     <Compile Include="WebTimer.cs" />
     <EmbeddedResource Include="BalloonForm.resx">
       <DependentUpon>BalloonForm.cs</DependentUpon>
@@ -201,6 +200,7 @@
     </Compile>
     <EmbeddedResource Include="TDNetForm.resx">
       <DependentUpon>TDNetForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Utility\NumericTextBox .resx">
       <DependentUpon>NumericTextBox .cs</DependentUpon>

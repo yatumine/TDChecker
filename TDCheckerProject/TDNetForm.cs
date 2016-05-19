@@ -15,6 +15,8 @@ using COMMON.Const;
 using COMMON.Utility;
 using System.Diagnostics;
 using TDChecker.Properties;
+using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace TDChecker
 {
@@ -27,26 +29,25 @@ namespace TDChecker
         // --------------------
         // メンバー変数
         // --------------------
-        private TDData gOldData;
-        private Boolean gInitFlg = true;    // 画面起動フラグ
-        private Boolean gInitReadFlg = true;// 画面起動時初回読み込みフラグ
-        private Boolean gKeyWordFlg = false;
+        private TDData OldData;
+        private Boolean InitFlg = true;    // 画面起動フラグ
+        private Boolean InitReadFlg = true;// 画面起動時初回読み込みフラグ
+        private Boolean KeyWordFlg = false;
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="argumentValues"></param>
         public TDNetForm() 
         {
             // 初期化フラグOn
-            gInitFlg = true;
+            InitFlg = true;
 
             InitializeComponent();
 
             // 初期化
-            gOldData = new TDData();
+            OldData = new TDData();
             lblClock.Text = DateTime.Now.ToString(Constants.YYYYMMDDHHMM_SLASH);
-            timer1.Enabled = false;
+            mainTimer.Enabled = false;
 
             // -------------------
             // リスト設定
@@ -67,7 +68,7 @@ namespace TDChecker
             mGridKeyWord.Columns[5].HeaderCell.Value = "URL";
 
             // 初期化フラグOff
-            gInitFlg = false;
+            InitFlg = false;
         }
 
         /// <summary>
@@ -81,7 +82,7 @@ namespace TDChecker
             GetKeyWord();
 
             // タイマー起動
-            timer1.Enabled = true;
+            mainTimer.Enabled = true;
 
             // ツールチップ設定
             ToolTip toolTip = new ToolTip();
@@ -103,54 +104,44 @@ namespace TDChecker
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void timer1_Tick(object sender, EventArgs e)
+        private void mainTimer_Tick(object sender, EventArgs e)
         {
-            try { 
-                // 時計更新
-                lblClock.Text = DateTime.Now.ToString(Constants.YYYYMMDDHHMM_SLASH);
+            mainTimer.Enabled = false;
 
+            // 時計更新
+            lblClock.Text = DateTime.Now.ToString(Constants.YYYYMMDDHHMM_SLASH);
 
-                if (gInitFlg)
-                {
-                    return;
-                }
-
-                timer1.Enabled = false;
-
-                // ボタン設定
-                SetFilterStatus(gKeyWordFlg);
-
-                // 検索キーワード存在
-                if (mtxtKeyWord.Text != "" && gKeyWordFlg == true)
-                {
-                    // ------------------------------
-                    // 画面の再描画 検索
-                    // ------------------------------
-                    KeyWordMode(Constants.GRID_MODE_KEYWORD);
-                    SetDisplayGrid(Constants.GRID_MODE_KEYWORD);
-
-                }
-                else
-                {
-                    // ------------------------------
-                    // 画面の再描画 全件
-                    // ------------------------------
-                    KeyWordMode(Constants.GRID_MODE_NOMAL);
-                    SetDisplayGrid(Constants.GRID_MODE_NOMAL);
-
-                } 
-
-                // アクティブグリッド表示件数
-                GetListCount();
-
-                gInitReadFlg = false;
-                timer1.Enabled = true;
-            }
-            catch (Exception ex)
+            if (InitFlg)
             {
-                LogUtility.WriteTraceLog("【SubForm】 Timerでの例外発生", ex);
-                this.Close();
+                return;
             }
+
+            // ボタン設定
+            SetFilterStatus(KeyWordFlg);
+
+            // 検索キーワード存在
+            if (mtxtKeyWord.Text != "" && KeyWordFlg == true)
+            {
+                // ------------------------------
+                // 画面の再描画 検索
+                // ------------------------------
+                KeyWordMode(Constants.GridModeKeyWord);
+                SetDisplayGrid(Constants.GridModeKeyWord);
+            }
+            else
+            {
+                // ------------------------------
+                // 画面の再描画 全件
+                // ------------------------------
+                KeyWordMode(Constants.GridModeNomal);
+                SetDisplayGrid(Constants.GridModeNomal);
+            } 
+
+            // アクティブグリッド表示件数
+            GetListCount();
+
+            InitReadFlg = false;
+            mainTimer.Enabled = true;
         }
 
         private void Form_Resize(object sender, EventArgs e)
@@ -166,8 +157,8 @@ namespace TDChecker
         {
             //フォーカスを外す
             this.ActiveControl = null;
-            OptionForm OpForm = new OptionForm();
-            OpForm.Show();
+            OptionForm optionForm = new OptionForm();
+            optionForm.Show();
 
             // 設定を再読み込み
             Properties.Settings.Default.Reload();
@@ -181,20 +172,20 @@ namespace TDChecker
         private void metroButton1_Click(object sender, EventArgs e)
         {
 
-            if (gKeyWordFlg == false)
+            if (KeyWordFlg == false)
             {
                 // キーワード検索モード
-                KeyWordMode(Constants.GRID_MODE_KEYWORD, true);
+                KeyWordMode(Constants.GridModeKeyWord, true);
             }
             else
             {
                 // 通常モード
-                KeyWordMode(Constants.GRID_MODE_NOMAL);
+                KeyWordMode(Constants.GridModeNomal);
 
             }
 
             // ボタン設定
-            SetFilterStatus(gKeyWordFlg);
+            SetFilterStatus(KeyWordFlg);
 
             // 検索設定の保存
             SetKeyWord();
@@ -203,32 +194,30 @@ namespace TDChecker
         /// <summary>
         /// フィルタボタンの状態設定
         /// </summary>
-        private void SetFilterStatus( Boolean pKeyWordFilter )
+        private void SetFilterStatus( Boolean paramKeyWordFilter )
         {
             // キーワード検索判定
-            if (pKeyWordFilter == true)
+            if (paramKeyWordFilter == true)
             {
                 // キーワード検索ON
                 mBtnFilter.BackColor = Color.Gray;
                 mBtnFilter.ForeColor = Color.White;
-                mBtnFilter.Text = Constants.BTN_FILTER_ON;
-
+                mBtnFilter.Text = Constants.BtnFilterOn;
             }
             else
             {
                 // キーワード検索OFF
                 mBtnFilter.BackColor = Control.DefaultBackColor;
                 mBtnFilter.ForeColor = Color.Black;
-                mBtnFilter.Text = Constants.BTN_FILTER_DEFAULT;
-
+                mBtnFilter.Text = Constants.BtnFilterDefault;
             }
         }
 
         /// <summary>
         /// 再描画
         /// </summary>
-        /// <param name="pRow"></param>
-        private void ListRepaint(DataRow[] pRow = null)
+        /// <param name="rowList">表示用リスト</param>
+        private void ListRepaint(DataRow[] rowList = null)
         {
             // 検索設定の保存
             SetKeyWord();
@@ -246,9 +235,9 @@ namespace TDChecker
             // 再描写
             // ---------------------------------------------
             if (listBuff.Count != 0 &&
-                (!listBuff[0].Time.Equals(gOldData.Time) ||
-                 !listBuff[0].Code.Equals(gOldData.Code) ||
-                 !listBuff[0].Title.Equals(gOldData.Title))
+                (!listBuff[0].Time.Equals(OldData.Time) ||
+                 !listBuff[0].Code.Equals(OldData.Code) ||
+                 !listBuff[0].Title.Equals(OldData.Title))
                 )
             {
 
@@ -256,16 +245,14 @@ namespace TDChecker
                 // 検索データ表示
                 // --------------------
                 // 検索データがある または 検索モードの場合、検索データを使用
-                if (pRow != null && gKeyWordFlg == true)
+                if (rowList != null && KeyWordFlg == true)
                 {
                     // 検索データをセット
-                    foreach (DataRow dRow in pRow)
+                    foreach (DataRow tdDataRow in rowList)
                     {
                         // Key検索用グリッドの表示
-                        tdDataListKey.TDNet.ImportRow(dRow);
+                        tdDataListKey.TDNet.ImportRow(tdDataRow);
                     }
-
-                    //tdDataListKey.TDNet.Select("", "DataColumnTime DESC");
 
                     // -----------------------------------
                     // oldデータへ時刻が最新なものを保持
@@ -275,41 +262,41 @@ namespace TDChecker
 
                     return;
                 }
-                else if ( gKeyWordFlg == false )
+                else if ( KeyWordFlg == false )
                 {
                     // --------------------
                     // 通常表示
                     // --------------------
-                    Debug.WriteLine("◆再描写　list count[{0}] old[{1}]", listBuff.Count, gOldData.Code);
+                    Debug.WriteLine("◆再描写　list count[{0}] old[{1}]", listBuff.Count, OldData.Code);
                     for (int cnt = 0; cnt < listBuff.Count; cnt++)
                     {
                         Debug.WriteLine("データ{0},{1},{2},{3},{4}", cnt, listBuff[cnt].Time, listBuff[cnt].Code, listBuff[cnt].CompanyName, listBuff[cnt].Title);
 
                         // -----------------------------------
-                        // 追加レコード作製
+                        // 追加レコード作成
                         // -----------------------------------
-                        DataRow dRow;
-                        dRow = tDDataList.TDNet.NewRow();
+                        DataRow newTdDataRow;
+                        newTdDataRow = tDDataList.TDNet.NewRow();
                         // パラメータ設定
-                        dRow["DataColumnDate"] = listBuff[cnt].Date;
-                        dRow["DataColumnTime"] = listBuff[cnt].Time;
-                        dRow["DataColumnCode"] = listBuff[cnt].Code;
-                        dRow["DataColumnCompanyName"] = listBuff[cnt].CompanyName;
-                        dRow["DataColumnTitle"] = listBuff[cnt].Title;
-                        dRow["DataColumnURL"] = listBuff[cnt].URL;
+                        newTdDataRow["DataColumnDate"] = listBuff[cnt].Date;
+                        newTdDataRow["DataColumnTime"] = listBuff[cnt].Time;
+                        newTdDataRow["DataColumnCode"] = listBuff[cnt].Code;
+                        newTdDataRow["DataColumnCompanyName"] = listBuff[cnt].CompanyName;
+                        newTdDataRow["DataColumnTitle"] = listBuff[cnt].Title;
+                        newTdDataRow["DataColumnURL"] = listBuff[cnt].URL;
 
                         // -----------------------------------
                         // 行追加
                         // -----------------------------------
-                        if (gInitReadFlg == true)
+                        if (InitReadFlg == true)
                         {
                             // oldデータがnullなら末尾から追加
-                            tDDataList.TDNet.Rows.Add(dRow);
+                            tDDataList.TDNet.Rows.Add(newTdDataRow);
                         }
                         else
                         {
                             // oldデータが存在するなら先頭から追加
-                            tDDataList.TDNet.Rows.InsertAt(dRow, 0);
+                            tDDataList.TDNet.Rows.InsertAt(newTdDataRow, 0);
                         }
 
                     }
@@ -320,11 +307,10 @@ namespace TDChecker
                 // ※リストにデータ追加後にoldデータを取得すること
                 // -----------------------------------
                 SetOldList(listBuff[0]);
-
             }
             else if (InputClearFlg == true)
             {
-                gOldData = new TDData();
+                OldData = new TDData();
                 // Key検索用の表クリア
                 tdDataListKey.Clear();
                 // 全件表示用の表クリア
@@ -336,16 +322,16 @@ namespace TDChecker
         /// <summary>
         /// oldデータへ時刻が最新な適時開示データを保存
         /// </summary>
-        /// <param name="pNewData"></param>
+        /// <param name="newData"></param>
         /// <returns></returns>
-        private Boolean SetOldList(TDData pNewData)
+        private Boolean SetOldList(TDData newData)
         {
-            gOldData.Date = pNewData.Date;
-            gOldData.Time = pNewData.Time;
-            gOldData.Code = pNewData.Code;
-            gOldData.CompanyName = pNewData.CompanyName;
-            gOldData.Title = pNewData.Title;
-            gOldData.URL = pNewData.URL;
+            OldData.Date = newData.Date;
+            OldData.Time = newData.Time;
+            OldData.Code = newData.Code;
+            OldData.CompanyName = newData.CompanyName;
+            OldData.Title = newData.Title;
+            OldData.URL = newData.URL;
 
             return true;
         }
@@ -361,16 +347,13 @@ namespace TDChecker
                 // 取得リスト件数
                 lblListNum.Text = mGridMain.RowCount + "件";
                 mGridMain.Refresh();
-
             }
             else
             {
                 // 取得リスト件数
                 lblListNum.Text = mGridKeyWord.RowCount + "件";
                 mGridMain.Refresh();
-
             }
-
         }
 
         /// <summary>
@@ -379,7 +362,8 @@ namespace TDChecker
         private void SetKeyWord()
         {
             // KeyWord 使用フラグ
-            Settings.Default.KeyFlag = gKeyWordFlg;
+            Settings.Default.KeyFlag = KeyWordFlg;
+
             // KeyWord　Code設定
             Settings.Default.KeyCode = mtxtKeyWord.Text;
 
@@ -396,7 +380,8 @@ namespace TDChecker
             Settings.Default.Reload();
 
             // KeyWord 使用フラグ
-            gKeyWordFlg = Settings.Default.KeyFlag;
+            KeyWordFlg = Settings.Default.KeyFlag;
+
             // KeyWord　Code設定
             mtxtKeyWord.Text = Settings.Default.KeyCode;
 
@@ -414,43 +399,39 @@ namespace TDChecker
                 return;
             }
 
-            if (gKeyWordFlg == false)
+            if (KeyWordFlg == false)
             {
-
                 // 再表示用に初期化
-                gOldData = new TDData();
+                OldData = new TDData();
 
                 // Key検索用の表クリア
                 tdDataListKey.Clear();
 
                 // キーワード検索モード
-                KeyWordMode(Constants.GRID_MODE_KEYWORD,true);
-
+                KeyWordMode(Constants.GridModeKeyWord,true);
             }
             else
             {
                 // 通常モード
-                KeyWordMode(Constants.GRID_MODE_NOMAL);
-
+                KeyWordMode(Constants.GridModeNomal);
             }
 
             // 検索設定の保存
             SetKeyWord();
-
         }
 
 
         /// <summary>
         /// キーワード検索モードON処理
         /// </summary>
-        /// <param name="pKeyWordFlg"></param>
+        /// <param name="paramKeyWordMode">キーワード検索モード</param>
+        /// <param name="paramForceRepaint">強制再表示フラグ</param>
         /// <returns></returns>
-        private Boolean KeyWordMode(int pKeyWordMode,Boolean pForceReset = false)
+        private Boolean KeyWordMode(int paramKeyWordMode,Boolean paramForceRepaint = false)
         {
-
-            switch (pKeyWordMode)
+            switch (paramKeyWordMode)
             {
-                case Constants.GRID_MODE_NOMAL:
+                case Constants.GridModeNomal:
                     // ----------------------------------
                     // 通常モード
                     // ----------------------------------
@@ -458,28 +439,28 @@ namespace TDChecker
                     // -------------------------------
                     // 再表示が必要か判断
                     // -------------------------------
-                    if (tDDataList.TDNet.Count == 0 || pForceReset == true)
+                    if (tDDataList.TDNet.Count == 0 || paramForceRepaint == true)
                     {
                         // 再表示用に初期化
-                        gOldData = new TDData();
+                        OldData = new TDData();
 
                         // 全表示用の表クリア
                         tDDataList.Clear();
                     }
-                    gKeyWordFlg = false;
+                    KeyWordFlg = false;
                     ListRepaint();
                     break;
-                case Constants.GRID_MODE_KEYWORD:
+                case Constants.GridModeKeyWord:
                     // -----------------------
                     // キーワード検索モード
                     // -----------------------
 
-                    gKeyWordFlg = true;
+                    KeyWordFlg = true;
                     // 全件表示用にデータが存在するか
                     if (tDDataList.TDNet.Count == 0)
                     {
                         // 再表示用に初期化
-                        gOldData = new TDData();
+                        OldData = new TDData();
 
                         // マスターデータの読み込み処理
                         ListRepaint();
@@ -488,10 +469,10 @@ namespace TDChecker
                     // -------------------------------
                     // 再表示が必要か判断
                     // -------------------------------
-                    if (tdDataListKey.TDNet.Count == 0 || pForceReset == true)
+                    if (tdDataListKey.TDNet.Count == 0 || paramForceRepaint == true)
                     {
                         // 再表示用に初期化
-                        gOldData = new TDData();
+                        OldData = new TDData();
 
                         // Key検索用の表クリア
                         tdDataListKey.Clear();
@@ -501,7 +482,7 @@ namespace TDChecker
                     DataRow[] rows = DataUtility.GetKeyWordData(tDDataList.TDNet, "DataColumnCode", mtxtKeyWord.Text);
                     ListRepaint(rows);
                     break;
-                case Constants.GRID_MODE_AUTOSELECT:
+                case Constants.GridModeAutoSelect:
                     if (mGridMain.Visible == true)
                     {
                         // 通常モード表示グリッド切り替え
@@ -523,23 +504,22 @@ namespace TDChecker
         /// <summary>
         /// 表示グリッド切り替え
         /// </summary>
-        /// <param name="pKeyWordMode"></param>
-        private void SetDisplayGrid(int pMode)
+        /// <param name="displayMode"></param>
+        private void SetDisplayGrid(int displayMode)
         {
-
-            switch (pMode)
+            switch (displayMode)
             {
-                case Constants.GRID_MODE_NOMAL:
+                case Constants.GridModeNomal:
                     // 通常モード表示グリッド切り替え
                     mGridKeyWord.Visible = false;
                     mGridMain.Visible = true;
                     break;
-                case Constants.GRID_MODE_KEYWORD:
+                case Constants.GridModeKeyWord:
                     // 検索モード表示グリッド切り替え
                     mGridKeyWord.Visible = true;
                     mGridMain.Visible = false;
                     break;
-                case Constants.GRID_MODE_AUTOSELECT:
+                case Constants.GridModeAutoSelect:
                     if (mGridMain.Visible == true)
                     {
                         // 通常モード表示グリッド切り替え
@@ -563,26 +543,35 @@ namespace TDChecker
         /// <param name="e"></param>
         private void mGrid_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-            try { 
+            try
+            {
                 DataGridView dgv = (DataGridView)sender;
                 DataGridViewSelectedRowCollection dgvCol = dgv.SelectedRows;
 
                 // 銘柄コードカラムの列番号取得
                 // DataGridViewの1行目のDataGridViewRow.DataBoundItemをDataRowViewとして取得
                 DataRowView drv = dgvCol[0].DataBoundItem as DataRowView;
-                // DataRowView.RowがDataRow型
                 DataRow dr = drv.Row;
 
-                String strCode = dr["DataColumnCode"].ToString();
+                String code = dr["DataColumnCode"].ToString();
 
                 // クリップボードに銘柄コード設定
-                Clipboard.SetText(strCode);
+                Clipboard.SetText(code);
 
-                lblStatus.Text = Constants.MSG_CODE_COPY + "[" + strCode + "]";
+                lblStatus.Text = Constants.MsgCodeCopy + "[" + code + "]";
             }
-            catch(Exception)
+            catch (ExternalException)
             {
+                Debug.WriteLine("Error:クリップボードが別のプロセスで使用されています。");
                 return;
+            }
+            catch (ArgumentException ex)
+            {
+                Debug.WriteLine("Error:Type[{0}]: {1}", ex.GetType().Name, ex.Message);
+            }
+            catch (ThreadStateException)
+            {
+                Debug.WriteLine("Error:スレッドの現在の状態によってクリップボード操作が実行できませんでした。");
             }
         }
     }

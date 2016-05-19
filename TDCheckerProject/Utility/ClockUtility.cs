@@ -10,119 +10,137 @@ namespace COMMON.Utility
     public static class ClockUtility
     {
         // --------------------
+        // メンバ変数
+        // --------------------
+        private static String NextTime;
+
+        // --------------------
         // プロパティ
         // --------------------
-        private static String gNextTime;
 
         /// 次回更新時刻
         /// </summary>
-        public static String IsNextTime { get { return gNextTime; } }
+        public static String IsNextTime { get { return NextTime; } }
 
+
+        /// <summary>
+        /// 読込間隔（分）
+        /// </summary>
+        public enum ReadCycle : int
+        { 
+            e_1_Minutes = 1,
+            e_5_Minutes = 5,
+            e_10_Minutes = 10,
+            e_30_Minutes = 30,
+            e_50_Minutes = 50,
+            e_55_Minutes = 55,
+            e_60_Minutes = 60,
+            e_1_Hour = 1,
+
+        };
 
         /// <summary>
         /// 次回タイマー起動時刻取得処理
         /// </summary>
-        /// <param name="pReadCycle"></param>
+        /// <param name="readCycle"></param>
         /// <returns></returns>
-        public static double GetReadTime(TimeSpan pReadCycle)
+        public static double GetReadTime(TimeSpan readCycle)
         {
-            DateTime dtNext = DateTime.Now;
-            TimeSpan ts;
-            int iMinute = dtNext.Minute;
-            int iOneMin = (iMinute % 10);
+            DateTime nextTimer = DateTime.Now;
+            int minute = nextTimer.Minute;
+            int remainingMin = (minute % (int)ReadCycle.e_10_Minutes);
 
             //-----------------------------------
             // 目標時刻までのTimeSpanを取得
             //-----------------------------------
             // 秒を正秒へ
-            dtNext = dtNext.AddSeconds(-dtNext.Second);
+            nextTimer = nextTimer.AddSeconds(-nextTimer.Second);
 
             // 指定タイミングの時刻設定
-            switch (pReadCycle.Minutes)
+            switch (readCycle.Minutes)
             {
-                case 1:
+                case (int)ReadCycle.e_1_Minutes:
                     // そのまま1分後
-                    dtNext = dtNext.AddMinutes(1);
+                    nextTimer = nextTimer.AddMinutes((int)ReadCycle.e_1_Minutes);
                     break;
 
-                case 5:
-                    // 一桁目取得
-
+                case (int)ReadCycle.e_5_Minutes:
+                    // 5分毎の時間へ変換
                     // 55分以上だった場合、時を繰り上げ
-                    if (dtNext.Minute >= 55)
+                    if (nextTimer.Minute >= (int)ReadCycle.e_55_Minutes)
                     {
-                        dtNext = dtNext.AddHours(1);
-                        dtNext = dtNext.AddMinutes(-iMinute);
+                        nextTimer = nextTimer.AddHours((int)ReadCycle.e_1_Hour);
+                        nextTimer = nextTimer.AddMinutes(-minute);
                     }
-                    else if (iOneMin >= 5) // 5分以上かどうか
+                    else if (remainingMin >= (int)ReadCycle.e_5_Minutes) // 5分以上かどうか
                     {
                         // 桁繰上げ
-                        dtNext = dtNext.AddMinutes(-iOneMin);   // 1の位を0へ
-                        dtNext = dtNext.AddMinutes(10);   // 10の位をあげる
+                        nextTimer = nextTimer.AddMinutes(-remainingMin);   // 1の位を0へ
+                        nextTimer = nextTimer.AddMinutes((int)ReadCycle.e_10_Minutes);   // 10の位をあげる
                     }
                     else
                     {
                         // 5分に設定
-                        dtNext = dtNext.AddMinutes(-iOneMin);
-                        dtNext = dtNext.AddMinutes(5);
+                        nextTimer = nextTimer.AddMinutes(-remainingMin);
+                        nextTimer = nextTimer.AddMinutes((int)ReadCycle.e_5_Minutes);
                     }
                     break;
 
-                case 10:
+                case (int)ReadCycle.e_10_Minutes:
                     // 10分後設定
-                    if (iMinute >= 50)
+                    if (minute >= (int)ReadCycle.e_50_Minutes)
                     {
                         // 時を繰り上げ
-                        dtNext = dtNext.AddHours(1);
-                        dtNext = dtNext.AddMinutes(-iMinute);
+                        nextTimer = nextTimer.AddHours((int)ReadCycle.e_1_Hour);
+                        nextTimer = nextTimer.AddMinutes(-minute);
                     }
                     else
                     {
                         // 10分後に設定
-                        dtNext = dtNext.AddMinutes(10);   // 10の位をあげる
+                        nextTimer = nextTimer.AddMinutes((int)ReadCycle.e_10_Minutes);   // 10の位をあげる
                         // 1の位は切り捨て
-                        dtNext = dtNext.AddMinutes(-iOneMin);   // 1の位を0へ
+                        nextTimer = nextTimer.AddMinutes(-remainingMin);   // 1の位を0へ
 
                     }
                     break;
 
-                case 30:
+                case (int)ReadCycle.e_30_Minutes:
                     // 30分以上かどうか
-                    if (iMinute >= 30)
+                    if (minute >= 30)
                     {
                         // 30分以上なら時を繰り上げ
-                        dtNext = dtNext.AddMinutes(-iOneMin);   // 1の位を0へ
+                        nextTimer = nextTimer.AddMinutes(-remainingMin);   // 1の位を0へ
                         // 1時間繰上げ
-                        dtNext = dtNext.AddHours(1);
+                        nextTimer = nextTimer.AddHours((int)ReadCycle.e_1_Hour);
 
                     }
                     else
                     {
                         // 30分に設定
-                        dtNext = dtNext.AddMinutes(-iMinute);
-                        dtNext = dtNext.AddMinutes(30);
+                        nextTimer = nextTimer.AddMinutes(-minute);
+                        nextTimer = nextTimer.AddMinutes((int)ReadCycle.e_30_Minutes);
                     }
                     break;
 
                 default:
                     // 1時間後
-                    if (pReadCycle.Hours == 1)
+                    if (readCycle.Hours == (int)ReadCycle.e_1_Hour)
                     {
                         // 1時間後に設定
-                        dtNext = dtNext.AddHours(1);
-                        dtNext = dtNext.AddMinutes(-iMinute);
+                        nextTimer = nextTimer.AddHours((int)ReadCycle.e_1_Hour);
+                        nextTimer = nextTimer.AddMinutes(-minute);
                     }
                     break;
 
             }
 
             // 目標時刻までのTimeSpanを取得
-            ts = dtNext - DateTime.Now;
-            gNextTime = dtNext.ToString();
+            TimeSpan nextTimeInterval = nextTimer - DateTime.Now;
+            NextTime = nextTimer.ToString();
 
-            Debug.WriteLine("★次回タイマー起動時刻 {0}", dtNext);
+            Debug.WriteLine("★次回タイマー起動時刻 {0}", nextTimer);
 
-            return ts.TotalMilliseconds;
+            return nextTimeInterval.TotalMilliseconds;
         }
     }
 }

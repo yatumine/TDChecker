@@ -13,6 +13,10 @@ namespace COMMON.Utility
     /// </summary>
     class HttpUtility
     {
+        /// <summary>
+        /// タイムアウト（秒）
+        /// </summary>
+        private readonly double TimeoutSec = 10.0;
 
         /// <summary>
         /// Urlへ接続してWeb取得
@@ -23,22 +27,21 @@ namespace COMMON.Utility
         {
             using (HttpClient client = new HttpClient())
             {
-                // ユーザーエージェント文字列をセット（オプション）
+                // ユーザーエージェント文字列をセット（IEとしてデータを取得）
                 client.DefaultRequestHeaders.Add(
                     "User-Agent",
                     "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko");
 
-                // 受け入れ言語をセット（オプション）
+                // 受け入れ言語をセット
                 client.DefaultRequestHeaders.Add("Accept-Language", "ja-JP");
 
-                // タイムアウトをセット（オプション）
-                client.Timeout = TimeSpan.FromSeconds(10.0);
+                // タイムアウトをセット
+                client.Timeout = TimeSpan.FromSeconds(TimeoutSec);
 
                 try
                 {
-                    // Webページを取得するのは、事実上この1行だけ
+                    // Webページを取得
                     return await client.GetStringAsync(uri);
-
                 }
                 catch (HttpRequestException e)
                 {
@@ -65,14 +68,12 @@ namespace COMMON.Utility
         /// <summary>
         /// 接続先URLチェック
         /// </summary>
-        /// <param name="pUrl"></param>
+        /// <param name="url"></param>
         /// <returns></returns>
-        public static Boolean UrlConnectCheck(String pUrl)
+        public static Boolean UrlConnectCheck(String url)
         {
-            Boolean bRet = false;
-
             //WebRequestの作成
-            HttpWebRequest webreq = (HttpWebRequest)WebRequest.Create(pUrl);
+            HttpWebRequest webreq = (HttpWebRequest)WebRequest.Create(url);
 
             HttpWebResponse webres = null;
             try
@@ -81,9 +82,9 @@ namespace COMMON.Utility
                 webres = (HttpWebResponse)webreq.GetResponse();
 
                 //応答したURIを表示する
-                Console.WriteLine(webres.ResponseUri);
+                Debug.WriteLine(webres.ResponseUri);
                 //応答ステータスコードを表示する
-                Console.WriteLine("{0}:{1}",
+                Debug.WriteLine("{0}:{1}",
                     webres.StatusCode, webres.StatusDescription);
             }
             catch (WebException ex)
@@ -101,7 +102,10 @@ namespace COMMON.Utility
                         errres.StatusCode, errres.StatusDescription);
                 }
                 else
+                { 
                     Debug.WriteLine(ex.Message);
+                }
+                return false;
             }
             finally
             {
@@ -109,15 +113,9 @@ namespace COMMON.Utility
                 if (webres != null)
                 {
                     webres.Close();
-                    bRet = true;
-
-                }
-                else
-                {
-                    bRet = false;
                 }
             }
-            return bRet;
+            return true;
         }
     }
 }
