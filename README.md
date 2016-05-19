@@ -22,3 +22,9 @@ TDChecker ( “適時開示チェッカー” ) は、
 * .Netframework 4.5.2
 * Metro Framework 1.3.5
 * HtmlAgilityPack.1.4.9
+
+
+## Author
+
+[Vector:TDChecker]](http://www.vector.co.jp/soft/winnt/business/se512438.html?ds)
+(Vectorは審査の関係上、最新のリリースではない可能性があります。GitHub上の[Release](https://github.com/yatumine/TDChecker/releases)で最新版が取得可能です。)
