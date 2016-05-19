@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="TDDataList" targetNamespace="http://tempuri.org/TDDataList.xsd" xmlns:mstns="http://tempuri.org/TDDataList.xsd" xmlns="http://tempuri.org/TDDataList.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="TDDataList" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="TDDataList" msprop:Generator_UserDSName="TDDataList">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="TDNet" msprop:Generator_TableClassName="TDNetDataTable" msprop:Generator_TableVarName="tableTDNet" msprop:Generator_RowChangedName="TDNetRowChanged" msprop:Generator_TablePropName="TDNet" msprop:Generator_RowDeletingName="TDNetRowDeleting" msprop:Generator_RowChangingName="TDNetRowChanging" msprop:Generator_RowEvHandlerName="TDNetRowChangeEventHandler" msprop:Generator_RowDeletedName="TDNetRowDeleted" msprop:Generator_RowClassName="TDNetRow" msprop:Generator_UserTableName="TDNet" msprop:Generator_RowEvArgName="TDNetRowChangeEvent">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="DataColumnDate" msdata:Caption="月日" msprop:Generator_ColumnVarNameInTable="columnDataColumnDate" msprop:Generator_ColumnPropNameInRow="DataColumnDate" msprop:Generator_ColumnPropNameInTable="DataColumnDateColumn" msprop:Generator_UserColumnName="DataColumnDate" type="xs:string" default="" />
+              <xs:element name="DataColumnTime" msdata:Caption="時刻" msprop:Generator_ColumnVarNameInTable="columnDataColumnTime" msprop:Generator_ColumnPropNameInRow="DataColumnTime" msprop:Generator_ColumnPropNameInTable="DataColumnTimeColumn" msprop:Generator_UserColumnName="DataColumnTime" type="xs:string" default="" />
+              <xs:element name="DataColumnCode" msdata:Caption="銘柄" msprop:Generator_ColumnVarNameInTable="columnDataColumnCode" msprop:Generator_ColumnPropNameInRow="DataColumnCode" msprop:Generator_ColumnPropNameInTable="DataColumnCodeColumn" msprop:Generator_UserColumnName="DataColumnCode" type="xs:string" default="" minOccurs="0" />
+              <xs:element name="DataColumnCompanyName" msdata:Caption="会社名" msprop:Generator_ColumnVarNameInTable="columnDataColumnCompanyName" msprop:Generator_ColumnPropNameInRow="DataColumnCompanyName" msprop:Generator_ColumnPropNameInTable="DataColumnCompanyNameColumn" msprop:Generator_UserColumnName="DataColumnCompanyName" type="xs:string" default="" minOccurs="0" />
+              <xs:element name="DataColumnTitle" msdata:Caption="タイトル" msprop:Generator_ColumnVarNameInTable="columnDataColumnTitle" msprop:Generator_ColumnPropNameInRow="DataColumnTitle" msprop:Generator_ColumnPropNameInTable="DataColumnTitleColumn" msprop:Generator_UserColumnName="DataColumnTitle" type="xs:string" default="" minOccurs="0" />
+              <xs:element name="DataColumnURL" msdata:Caption="URL" msprop:Generator_ColumnVarNameInTable="columnDataColumnURL" msprop:Generator_ColumnPropNameInRow="DataColumnURL" msprop:Generator_ColumnPropNameInTable="DataColumnURLColumn" msprop:Generator_UserColumnName="DataColumnURL" type="xs:string" default="" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="OptionReadCycle" msprop:Generator_TableClassName="OptionReadCycleDataTable" msprop:Generator_TableVarName="tableOptionReadCycle" msprop:Generator_RowChangedName="OptionReadCycleRowChanged" msprop:Generator_TablePropName="OptionReadCycle" msprop:Generator_RowDeletingName="OptionReadCycleRowDeleting" msprop:Generator_RowChangingName="OptionReadCycleRowChanging" msprop:Generator_RowEvHandlerName="OptionReadCycleRowChangeEventHandler" msprop:Generator_RowDeletedName="OptionReadCycleRowDeleted" msprop:Generator_RowClassName="OptionReadCycleRow" msprop:Generator_UserTableName="OptionReadCycle" msprop:Generator_RowEvArgName="OptionReadCycleRowChangeEvent">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="DataColumnCycle" msdata:Caption="間隔" msprop:Generator_ColumnVarNameInTable="columnDataColumnCycle" msprop:Generator_ColumnPropNameInRow="DataColumnCycle" msprop:Generator_ColumnPropNameInTable="DataColumnCycleColumn" msprop:Generator_UserColumnName="DataColumnCycle" type="xs:string" default="" minOccurs="0" />
+              <xs:element name="DataColumnValue" msprop:Generator_ColumnVarNameInTable="columnDataColumnValue" msprop:Generator_ColumnPropNameInRow="DataColumnValue" msprop:Generator_ColumnPropNameInTable="DataColumnValueColumn" msprop:Generator_UserColumnName="DataColumnValue" type="xs:int" default="1" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
